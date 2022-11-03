@@ -2,3 +2,5 @@ Django
 django-cors-headers
 djangorestframework
 gunicorn
+psycopg2
+django-dotenv
