@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sharedb',
+    "consumer",
 ]
 
 MIDDLEWARE = [
@@ -85,16 +86,31 @@ DATABASES = {
 '''
 
 # PostgreSQL
-DATABASES = {
-    'default': {
-        'ENGINE': os.environ.get("DB_ENGINE"),
-        'NAME': os.environ.get("DB_NAME"), # Schema Name
-        'USER': os.environ.get("DB_USER"),
-        'PASSWORD': os.environ.get("DB_PASSWORD"), # PASSWORD NAME
-        'HOST':os.environ.get("DB_HOST"),
-        'PORT':os.environ.get("DB_PORT"),
+IS_TESTING_MODE = True
+
+if IS_TESTING_MODE:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'moa_gudok', # Schema Name
+            'USER': 'postgres', 
+            'PASSWORD': 'rlatjsals1!', # PASSWORD NAME
+            'HOST': '127.0.0.1', 
+            'PORT': '5432', 
+        }
     }
-}
+# NOT TESTING MODE
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': os.environ.get("DB_ENGINE"),
+            'NAME': os.environ.get("DB_NAME"), # Schema Name
+            'USER': os.environ.get("DB_USER"),
+            'PASSWORD': os.environ.get("DB_PASSWORD"), # PASSWORD NAME
+            'HOST':os.environ.get("DB_HOST"),
+            'PORT':os.environ.get("DB_PORT"),
+        }
+    }
 
 
 # Password validation

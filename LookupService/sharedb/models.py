@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 SIGNUP_METHOD = (
         ("Standard", "홈페이지"), ("Google", "구글"),
@@ -16,17 +16,43 @@ class SignupMethod(models.Model):
     class Meta:
         db_table = 'SignupMethod'
 
+
+class UserManager(BaseUserManager):
+    #일반 유저 생성
+    def create_user(self, email, password=None):
+        if not email:
+            raise ValueError('must have an email')
+        user = self.model(
+            email=email
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+    
+    # 관리자 계정 생성
+    def create_superuser(self, email, password=None):
+        user = self.create_user(
+            email=email,
+            password=password
+        )
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
+
 # User(소비자/판매자) Table
 class User(AbstractBaseUser):        
     email = models.EmailField("이메일", max_length=150, unique=True, null=False, blank=False)
     name = models.CharField("이름", max_length=20)
-    password = models.CharField("비밀번호", max_length=20)
+    password = models.CharField("비밀번호", max_length=100)
     address = models.CharField("주소", max_length=100)
     join_date = models.DateTimeField("가입일", auto_now_add=True)
     signup_method = models.ForeignKey(SignupMethod, verbose_name="가입방법", on_delete=models.SET_NULL, null=True)
     is_active = models.BooleanField(default=True) # 계정활성화 여부
     is_seller = models.BooleanField(default=False) # 판매자 여부
     USERNAME_FIELD = 'email' # 로그인 시 사용할 필드 지정
+
+    objects = UserManager() # custom user 생성 시 필요
+
     class Meta:
         db_table = 'User'
 
