@@ -1,16 +1,25 @@
 version: "3.8"
 
 services:
-  auth_service:
-    build: ./AuthService/
-    command: gunicorn AuthService.wsgi:application --bind 0.0.0.0:8000"
+  nginx:
+    build: ./_nginx
     ports:
-      - 8000:8000
-    working_dir: /AuthService/
-    expose:
-      - 8000
-    env_file:
-      - ./.env
+      - 80:80
+    depends_on:
+#      - auth_service
+      - lookup_service
+#      - seller_service
+
+  # auth_service:
+  #   build: ./AuthService/
+  #   command: gunicorn AuthService.wsgi:application --bind 0.0.0.0:8000"
+  #   ports:
+  #     - 8000:8000
+  #   working_dir: /AuthService/
+  #   expose:
+  #     - 8000
+  #   env_file:
+  #     - ./.local.env
 
   lookup_service:
     build: ./LookupService/
@@ -21,20 +30,20 @@ services:
     expose:
       - 8001
     env_file:
-      - ./.env
+      - ./.local.env
 
-  seller_service:
-    build: ./SellerService/
-    command: gunicorn SellerService.wsgi:application --bind 0.0.0.0:8002"
-    ports:
-      - 8002:8002
-    working_dir: /SellerService/
-    expose:
-      - 8002
-    env_file:
-      - ./.env
+  # seller_service:
+  #   build: ./SellerService/
+  #   command: gunicorn SellerService.wsgi:application --bind 0.0.0.0:8002"
+  #   ports:
+  #     - 8002:8002
+  #   working_dir: /SellerService/
+  #   expose:
+  #     - 8002
+  #   env_file:
+  #     - ./.local.env
 
   ##
   # @TODO
-  # PaymentService - PORT : 8002
+  # PaymentService - PORT : 8003
   ## 
