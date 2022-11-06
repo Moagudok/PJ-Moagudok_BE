@@ -4,3 +4,5 @@ djangorestframework
 gunicorn
 psycopg2
 django-dotenv
+pytest-django
+pytest
