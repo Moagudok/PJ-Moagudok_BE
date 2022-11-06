@@ -2,7 +2,8 @@ Django
 django-cors-headers
 djangorestframework
 gunicorn
-psycopg2-binary
+psycopg2
 django-dotenv
 pytest-django
 pytest
+# psycopg2-binary : EC2-Linux
