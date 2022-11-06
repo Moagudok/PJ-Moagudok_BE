@@ -16,18 +16,25 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# TEST MODE
+MODE = "LOCAL"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+if MODE=="LOCAL_TEST" or MODE=='LOCAL':
+    SECRET_KEY = "django-insecure-h!ojgwre1e58)16&bmuve3mn#dnll#dt&eoo14!rq2s3bffkn2"
+else: # MODE = PRODUCTION
+    SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+if MODE == 'PRODUCTION':
+    ALLOWED_HOSTS = ["*"]
+else: # MODE = LOCAL or LOCAL_TEST
+    ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -86,9 +93,7 @@ DATABASES = {
 '''
 
 # PostgreSQL
-IS_TESTING_MODE = True
-
-if IS_TESTING_MODE:
+if MODE == 'LOCAL_TEST':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -99,8 +104,19 @@ if IS_TESTING_MODE:
             'PORT': '5432', 
         }
     }
+elif MODE == 'PRODUCTION':
+    DATABASES = {
+        'default': {
+            'ENGINE': os.environ.get("PRODUCTION_ENGINE"),
+            'NAME': os.environ.get("PRODUCTION_NAME"), # Schema Name
+            'USER': os.environ.get("PRODUCTION_USER"),
+            'PASSWORD': os.environ.get("PRODUCTION_PASSWORD"), # PASSWORD NAME
+            'HOST':os.environ.get("PRODUCTION_HOST"),
+            'PORT':os.environ.get("PRODUCTION_PORT"),
+        }
+    }
 # NOT TESTING MODE
-else:
+else: # MODE=LOCAL
     DATABASES = {
         'default': {
             'ENGINE': os.environ.get("DB_ENGINE"),
@@ -111,7 +127,6 @@ else:
             'PORT':os.environ.get("DB_PORT"),
         }
     }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -137,11 +152,12 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
+USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False  # 원래 True KOREA Time을 위한 False 설정
 
 
 # Static files (CSS, JavaScript, Images)
