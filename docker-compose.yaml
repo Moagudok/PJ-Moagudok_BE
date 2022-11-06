@@ -30,7 +30,7 @@ services:
     expose:
       - 8001
     env_file:
-      - ./.local.env
+      - ./LookupService/.local.env
 
   # seller_service:
   #   build: ./SellerService/
