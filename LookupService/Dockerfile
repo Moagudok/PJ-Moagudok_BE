@@ -5,7 +5,9 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update 
+
+COPY . /LookupService/
+WORKDIR /LookupService
+
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-WORKDIR /LookupService
-COPY . /LookupService/
