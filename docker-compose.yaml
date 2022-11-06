@@ -12,7 +12,7 @@ services:
 
   # auth_service:
   #   build: ./AuthService/
-  #   command: gunicorn AuthService.wsgi:application --bind 0.0.0.0:8000"
+  #   command: gunicorn AuthService.wsgi:application --bind 0.0.0.0:8000
   #   ports:
   #     - 8000:8000
   #   working_dir: /AuthService/
@@ -23,10 +23,10 @@ services:
 
   lookup_service:
     build: ./LookupService/
-    command: gunicorn LookupService.wsgi:application --bind 0.0.0.0:8001"
+    command: gunicorn LookupService.wsgi:application --bind 0.0.0.0:8001
     ports:
       - 8001:8001
-    working_dir: /LookupService/
+    working_dir: /LookupService/ # 반드시 / 여야함
     expose:
       - 8001
     env_file:
@@ -34,7 +34,7 @@ services:
 
   # seller_service:
   #   build: ./SellerService/
-  #   command: gunicorn SellerService.wsgi:application --bind 0.0.0.0:8002"
+  #   command: gunicorn SellerService.wsgi:application --bind 0.0.0.0:8002
   #   ports:
   #     - 8002:8002
   #   working_dir: /SellerService/
