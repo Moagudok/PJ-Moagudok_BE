@@ -1,7 +1,10 @@
 package org.payment.exception;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
-
+@Getter
+@AllArgsConstructor
 public enum ErrorCode {
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
     POSTS_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글 정보를 찾을 수 없습니다."),
@@ -11,16 +14,4 @@ public enum ErrorCode {
     private final HttpStatus status;
     private final String message;
 
-    public HttpStatus getStatus() {
-        return this.status;
-    }
-
-    public String getMessage() {
-        return this.message;
-    }
-
-    private ErrorCode(final HttpStatus status, final String message) {
-        this.status = status;
-        this.message = message;
-    }
 }

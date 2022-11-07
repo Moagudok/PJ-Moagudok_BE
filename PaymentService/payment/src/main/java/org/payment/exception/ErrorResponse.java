@@ -1,7 +1,9 @@
 package org.payment.exception;
 
-import java.time.LocalDateTime;
+import lombok.Getter;
 
+import java.time.LocalDateTime;
+@Getter
 public class ErrorResponse {
     private final LocalDateTime timestamp = LocalDateTime.now();
     private final int status;
@@ -16,23 +18,4 @@ public class ErrorResponse {
         this.message = errorCode.getMessage();
     }
 
-    public LocalDateTime getTimestamp() {
-        return this.timestamp;
-    }
-
-    public int getStatus() {
-        return this.status;
-    }
-
-    public String getError() {
-        return this.error;
-    }
-
-    public String getCode() {
-        return this.code;
-    }
-
-    public String getMessage() {
-        return this.message;
-    }
 }

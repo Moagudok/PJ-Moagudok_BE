@@ -3,6 +3,8 @@ package org.payment.service;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
+
+import lombok.RequiredArgsConstructor;
 import org.payment.DTO.PaymentRequestDTO;
 import org.payment.DTO.PaymentResponseDTO;
 import org.payment.entity.Payment;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class PaymentService {
     private final PaymentRepository paymentRepository;
 
@@ -22,24 +25,21 @@ public class PaymentService {
     }
 
     public List<PaymentResponseDTO> findAll() {
-        Sort sort = Sort.by(Direction.DESC, new String[]{"id"});
+        Sort sort = Sort.by(Direction.DESC, "id");
         List<Payment> list = this.paymentRepository.findAll(sort);
-        return (List)list.stream().map(PaymentResponseDTO::new).collect(Collectors.toList());
+        return list.stream().map(PaymentResponseDTO::new).collect(Collectors.toList());
     }
 
     @Transactional
     public List<PaymentResponseDTO> findByConsumerId(Long consumerId) {
         List<Payment> list = this.paymentRepository.findAllByConsumerId(consumerId);
-        return (List)list.stream().map(PaymentResponseDTO::new).collect(Collectors.toList());
+        return list.stream().map(PaymentResponseDTO::new).collect(Collectors.toList());
     }
 
     @Transactional
     public List<PaymentResponseDTO> findBySellerId(Long sellerId) {
         List<Payment> list = this.paymentRepository.findAllBySellerId(sellerId);
-        return (List)list.stream().map(PaymentResponseDTO::new).collect(Collectors.toList());
+        return list.stream().map(PaymentResponseDTO::new).collect(Collectors.toList());
     }
 
-    public PaymentService(final PaymentRepository paymentRepository) {
-        this.paymentRepository = paymentRepository;
-    }
 }
