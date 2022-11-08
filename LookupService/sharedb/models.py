@@ -56,13 +56,6 @@ class User(AbstractBaseUser):
     class Meta:
         db_table = 'User'
 
-# 상품 상세 이미지들
-class ProductImages(models.Model):
-    image = models.TextField("상품 상세 이미지", null=True, blank=True)
-    
-    class Meta:
-        db_table = 'ProductImages'
-
 # 카테고리
 class Category(models.Model):
     name = models.CharField("카테고리 이름", max_length=30)
@@ -89,13 +82,21 @@ class Product(models.Model):
     update_date = models.DateField("상품 수정일", auto_now=True)
     price = models.PositiveIntegerField("상품 가격")
     image = models.TextField("상품 대표 이미지", null=True, blank=True)
-    detail_images = models.ForeignKey(ProductImages, verbose_name = "상품 상세 이미지들", on_delete=models.SET_NULL, null=True) # 
     description = models.TextField("상품 설명")
-    views = models.PositiveIntegerField("상품 조회 수")
-    num_of_subscribers = models.PositiveIntegerField("구독자 수")
+    views = models.PositiveIntegerField("상품 조회 수", default=0)
+    num_of_subscribers = models.PositiveIntegerField("구독자 수", default=0)
     
     class Meta:
         db_table = 'Product'
+
+
+# 상품 상세 이미지들
+class ProductImages(models.Model):
+    image = models.TextField("상품 상세 이미지", null=True, blank=True)
+    product = models.ForeignKey(Product, verbose_name="소속 상품", on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        db_table = 'ProductImages'
 
 # 결제 정보 (=구독 정보)
 class Payment(models.Model):
