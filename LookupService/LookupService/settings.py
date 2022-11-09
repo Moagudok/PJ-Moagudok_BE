@@ -16,11 +16,11 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# TEST MODE
-MODE = "LOCAL"
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
+## TEST MODE
+# LOCAL_TEST : TEST CODE 작성시
+# LOCAL : 로컬 서버 돌릴 때 
+# PRODUCTION : 배포용
+MODE = "LOCAL_TEST"
 
 # SECURITY WARNING: keep the secret key used in production secret!
 if MODE=="LOCAL_TEST" or MODE=='LOCAL':
@@ -99,7 +99,7 @@ if MODE == 'LOCAL_TEST':
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'moa_gudok', # Schema Name
             'USER': 'postgres', 
-            'PASSWORD': 'rlatjsals1!', # PASSWORD NAME
+            'PASSWORD': 'rlatjsals1!', # PASSWORD
             'HOST': '127.0.0.1', 
             'PORT': '5432', 
         }
@@ -110,7 +110,7 @@ elif MODE == 'PRODUCTION':
             'ENGINE': os.environ.get("PRODUCTION_ENGINE"),
             'NAME': os.environ.get("PRODUCTION_NAME"), # Schema Name
             'USER': os.environ.get("PRODUCTION_USER"),
-            'PASSWORD': os.environ.get("PRODUCTION_PASSWORD"), # PASSWORD NAME
+            'PASSWORD': os.environ.get("PRODUCTION_PASSWORD"), # PASSWORD
             'HOST':os.environ.get("PRODUCTION_HOST"),
             'PORT':os.environ.get("PRODUCTION_PORT"),
         }
