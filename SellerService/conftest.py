@@ -52,6 +52,17 @@ def CreateUser():
 
 
 @pytest.fixture
+def CreatePaymentTerm():
+    PaymentTerm.objects.bulk_create([
+        PaymentTerm(1, '일'),
+        PaymentTerm(2, '주'),
+        PaymentTerm(3, '월'),
+        PaymentTerm(4, '분기'),
+    ])
+    print("PaymentTerm is created")
+
+
+@pytest.fixture
 def CreateProductImages():
     ProductImages.objects.bulk_create([
         ProductImages(
