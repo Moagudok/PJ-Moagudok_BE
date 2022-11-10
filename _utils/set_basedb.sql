@@ -64,7 +64,3 @@ INSERT INTO public."ProductImages"(id, image, product_id)
 	(4, 'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_crawling_news_it_detail2.jpg', 1),
 	(5, 'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_processed_food_spam_detail1.jpg', 7),
 	(6, 'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_processed_food_tuna_detail1.jpg', 8);
-
-
-DELETE FROM public."ProductImages";
-DELETE FROM public."Product";
