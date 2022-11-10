@@ -94,50 +94,39 @@ DATABASES = {
 '''
 
 # PostgreSQL
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'moa_gudok', # Schema Name
-        'USER': 'test',
-        'PASSWORD': 'test', # PASSWORD NAME
-        'HOST':'127.0.0.1',
-        'PORT':'5432',
+if MODE == 'LOCAL_TEST':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'moa_gudok', # Schema Name
+            'USER': 'test', 
+            'PASSWORD': 'test', # PASSWORD NAME
+            'HOST': '127.0.0.1', 
+            'PORT': '5432', 
+        }
     }
-}
-
-# if MODE == 'LOCAL_TEST':
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.postgresql',
-#             'NAME': 'moa_gudok', # Schema Name
-#             'USER': 'postgres', 
-#             'PASSWORD': '@kye09180', # PASSWORD NAME
-#             'HOST': '127.0.0.1', 
-#             'PORT': '5432', 
-#         }
-#     }
-# elif MODE == 'PRODUCTION':
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': os.environ.get("PRODUCTION_ENGINE"),
-#             'NAME': os.environ.get("PRODUCTION_NAME"), # Schema Name
-#             'USER': os.environ.get("PRODUCTION_USER"),
-#             'PASSWORD': os.environ.get("PRODUCTION_PASSWORD"), # PASSWORD NAME
-#             'HOST':os.environ.get("PRODUCTION_HOST"),
-#             'PORT':os.environ.get("PRODUCTION_PORT"),
-#         }
-#     }
-# else: # MODE=LOCAL
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': os.environ.get("DB_ENGINE"),
-#             'NAME': os.environ.get("DB_NAME"), # Schema Name
-#             'USER': os.environ.get("DB_USER"),
-#             'PASSWORD': os.environ.get("DB_PASSWORD"), # PASSWORD NAME
-#             'HOST':os.environ.get("DB_HOST"),
-#             'PORT':os.environ.get("DB_PORT"),
-#         }
-#     }
+elif MODE == 'PRODUCTION':
+    DATABASES = {
+        'default': {
+            'ENGINE': os.environ.get("PRODUCTION_ENGINE"),
+            'NAME': os.environ.get("PRODUCTION_NAME"), # Schema Name
+            'USER': os.environ.get("PRODUCTION_USER"),
+            'PASSWORD': os.environ.get("PRODUCTION_PASSWORD"), # PASSWORD NAME
+            'HOST':os.environ.get("PRODUCTION_HOST"),
+            'PORT':os.environ.get("PRODUCTION_PORT"),
+        }
+    }
+else: # MODE=LOCAL
+    DATABASES = {
+        'default': {
+            'ENGINE': os.environ.get("DB_ENGINE"),
+            'NAME': os.environ.get("DB_NAME"), # Schema Name
+            'USER': os.environ.get("DB_USER"),
+            'PASSWORD': os.environ.get("DB_PASSWORD"), # PASSWORD NAME
+            'HOST':os.environ.get("DB_HOST"),
+            'PORT':os.environ.get("DB_PORT"),
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
