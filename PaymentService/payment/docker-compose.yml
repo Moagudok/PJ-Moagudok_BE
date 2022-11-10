@@ -1,0 +1,26 @@
+version: "3"
+services:
+  db:
+    image: postgres:latest
+    container_name: postgresDB
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB = ${POSTGRES_DB}
+      - POSTGRES_HOST_AUTH_METHOD=trust
+
+  app:
+    image: spring-boot-docker:latest
+    container_name: spring-boot-docker
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/moa_gudok
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    links:
+      - db
+volumes:
+  postgres-data:

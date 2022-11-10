@@ -1,16 +1,18 @@
 package org.payment.DTO;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import lombok.Getter;
 import org.payment.entity.Payment;
+import org.springframework.format.annotation.DateTimeFormat;
+
 @Getter
 public class PaymentResponseDTO {
     private Long id;
     private Integer price;
-    private Date subscription_date;
-    private Date expiration_date;
-    private Date payment_due;
+    private LocalDate subscription_date;
+    private LocalDate expiration_date;
+    private String payment_due;
     private Long consumerId;
     private Long sellerId;
 

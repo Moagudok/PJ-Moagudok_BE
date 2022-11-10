@@ -1,17 +1,18 @@
 package org.payment.DTO;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.payment.entity.Payment;
+
 @Getter
 @NoArgsConstructor
 public class PaymentRequestDTO {
     private Integer price;
-    private Date subscription_date;
-    private Date expiration_date;
-    private Date payment_due;
+    private LocalDate subscription_date;
+    private LocalDate expiration_date;
+    private String payment_due;
     private Long consumerId;
     private Long sellerId;
 
