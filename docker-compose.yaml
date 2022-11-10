@@ -8,7 +8,7 @@ services:
     depends_on:
 #      - auth_service
       - lookup_service
-#      - seller_service
+      - seller_service
 
   # auth_service:
   #   build: ./AuthService/
@@ -32,16 +32,16 @@ services:
     env_file:
       - ./.local.env
 
-  # seller_service:
-  #   build: ./SellerService/
-  #   command: gunicorn SellerService.wsgi:application --bind 0.0.0.0:8002
-  #   ports:
-  #     - 8002:8002
-  #   working_dir: /SellerService/
-  #   expose:
-  #     - 8002
-  #   env_file:
-  #     - ./.local.env
+  seller_service:
+    build: ./SellerService/
+    command: gunicorn SellerService.wsgi:application --bind 0.0.0.0:8002
+    ports:
+      - 8002:8002
+    working_dir: /SellerService/
+    expose:
+      - 8002
+    env_file:
+      - ./.local.env
 
   ##
   # @TODO
