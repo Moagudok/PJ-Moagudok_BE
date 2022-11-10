@@ -1,8 +1,8 @@
 import pytest
-from sharedb.models import Category
+from sharedb.models import Category, Product
+from rest_framework.exceptions import ErrorDetail
 
-'''
-카테고리 리스트 조회 화면 TESTCODE
+''' 카테고리 리스트 조회 화면 TESTCODE
 결함 TEST 위주
 - Category 값 중 누락된건 없는지
 - 모든 Rows에 name과 image값이 다 있는지
@@ -24,8 +24,7 @@ class TestCategory():
         assert obj_cnt == 12, "Num of Category Rows is Failed"
         assert resp.status_code == 200
 
-'''
-상품 리스트 조회 (by 카테고리) 화면 TESTCODE
+''' 상품 리스트 조회 (by 카테고리) 화면 TESTCODE
 - 페이지 별 항목(row) 갯수가 맞는지
 - 첫 페이지 항목 속성 검사, 상태코드 검사
 - 모든 페이지가 정상적으로 다 반환되는지 (속성, 상태코드)
@@ -64,8 +63,7 @@ class TestProductListbyCategory():
         assert resp.data['detail'].code == 'not_found' # from rest_framework.exceptions import ErrorDetail
 
 
-'''
-상품 리스트 조회 (by 텍스트) 화면 TESTCODE
+''' 상품 리스트 조회 (by 텍스트) 화면 TESTCODE
 - 페이지 별 항목(row) 갯수가 맞는지
 - 첫 페이지 항목 속성 검사, 상태코드 검사
 - 모든 페이지가 정상적으로 다 반환되는지 (속성, 상태코드)
@@ -102,3 +100,25 @@ class TestProductListbyText():
         resp = client.get("/consumer/product/list?category&search=top&page="+str(PAGE_COUNT+1))
         assert resp.status_code == 404
         assert resp.data['detail'].code == 'not_found' # from rest_framework.exceptions import ErrorDetail
+
+
+
+''' 상품 상세 화면 TESTCODE
+- 총 상품 갯수 넘을 때 - 404
+- 총 상품 갯수 안넘을 때 - 200
+'''
+# @pytest.mark.skip()
+@pytest.mark.django_db
+class TestProductDetail():
+    def test_ProductDetail(self, CreateCategories, \
+        CreateSignupMethod, CreateUser, CreatePaymentTerm, \
+        CreateProducts, CreateProductImages, client):
+        
+        product_num = Product.objects.count()
+        resp = client.get("/consumer/product/detail/"+str(product_num))
+        assert resp.status_code == 200
+
+        resp = client.get("/consumer/product/detail/"+str(product_num+1))
+        assert resp.data == ErrorDetail(string = '존재하지 않는 구독 상품 입니다.', code=404)
+        assert resp.status_code == 404
+        
