@@ -48,6 +48,7 @@ class User(AbstractBaseUser):
     join_date = models.DateTimeField("가입일", auto_now_add=True)
     signup_method = models.ForeignKey(SignupMethod, verbose_name="가입방법", on_delete=models.SET_NULL, null=True)
     is_active = models.BooleanField(default=True) # 계정활성화 여부
+    is_admin = models.BooleanField(default=False)
     is_seller = models.BooleanField(default=False) # 판매자 여부
     USERNAME_FIELD = 'email' # 로그인 시 사용할 필드 지정
 
@@ -55,6 +56,19 @@ class User(AbstractBaseUser):
 
     class Meta:
         db_table = 'User'
+        
+    def __str__(self):
+        return f"{self.email}입니다."
+
+    def has_perm(self, perm, obj=None):
+        return True
+
+    def has_module_perms(self, app_label):
+        return True
+        
+    @property
+    def is_staff(self):
+        return self.is_admin
 
 # 카테고리
 class Category(models.Model):
