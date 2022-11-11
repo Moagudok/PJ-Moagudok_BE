@@ -2,9 +2,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets, status
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.exceptions import ErrorDetail
+
 from django.db.models import Q
 from sharedb.models import Category, Product
-from .serializers import ProductCategoryListSerializer, ProductListSerializer
+from .serializers import ProductCategoryListSerializer, ProductListSerializer, ProductDetailSerializer
 
 # url : /consumer/product/category
 class ProductCategoryListView(APIView):
@@ -35,6 +37,19 @@ class ProductListPaginationViewSet(viewsets.ModelViewSet):
         query_set = self.queryset.filter(condition)
         return query_set
 
+
+# url : /consumer/product/detail/{product_id}
+class ProductDeatilView(APIView):
+    def get(self, request, product_id):
+        try:
+            detail_product = Product.objects.get(id = product_id)
+        except:
+            return Response(ErrorDetail(string = '존재하지 않는 구독 상품 입니다.', code=404), status=status.HTTP_404_NOT_FOUND)
+
+        detail_product_data = ProductDetailSerializer(detail_product).data
+        return Response(detail_product_data, status=status.HTTP_200_OK)
+
+        
 
 ''' legacy code 
 def list(self, request):
