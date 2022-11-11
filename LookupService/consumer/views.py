@@ -16,7 +16,7 @@ class ProductCategoryListView(APIView):
         return Response(CategorySerializer_data, status.HTTP_200_OK)
 
 class ProductListPaginationClass(PageNumberPagination): # 
-    page_size = 2 # settings.py의 Default 값 변경
+    page_size = 10 # settings.py의 Default 값 변경
 
 # url : /consumer/product/list?category=1&search&page=1
 class ProductListPaginationViewSet(viewsets.ModelViewSet):
