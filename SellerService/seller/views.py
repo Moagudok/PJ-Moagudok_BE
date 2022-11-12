@@ -3,7 +3,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from sharedb.models import Product, ProductImages
+from sharedb.models import Product, ProductImages, Category, PaymentTerm, User
 
 from .serializers import ProductSerializer
 
@@ -12,15 +12,24 @@ STANDARD_NUM_OF_PRODUCTS = 10
 
 
 class ProductView(APIView):
-    # url = /seller/product/1?page=1&filter="views"
+    # url = /seller/product/1?page=1&filter="views"&?"group_name"="돼지좋아"
     def get(self, request: Request, seller_id) -> ProductSerializer:
 
         page_num = int(request.query_params["page"])
         filter = request.query_params["filter"]
         firter_list = ["recent", "views", "subscribers"]
 
-        sellers_product_all_query = Product.objects.filter(seller=seller_id)
+        # 만약 판매중인 구독 상품에서 그룹을 누른다면 그룹별 수정 페이지로 전환
+        group_name = request.query_params.get("group_name", None)
+        
+        if group_name:
+            sellers_product_all_query = Product.objects.filter(seller=seller_id, product_group_name = group_name)
+            is_grouped = True
+        else :
+            sellers_product_all_query = Product.objects.filter(seller=seller_id)
+            is_grouped = False
         sellers_product_count = sellers_product_all_query.count()
+
 
         # 최대 페이지 수, 필터링 단어 제한
         total_page = sellers_product_count // STANDARD_NUM_OF_PRODUCTS + 1
@@ -30,7 +39,7 @@ class ProductView(APIView):
         # filtering
         if filter == "recent":
             filtering_product_query = sellers_product_all_query.order_by(
-                "-register_date")
+                "-update_date")
         elif filter == "views":
             filtering_product_query = sellers_product_all_query.order_by(
                 "-views")
@@ -48,54 +57,44 @@ class ProductView(APIView):
             pagenated_sellers_product_query, many=True).data
         return Response({
             "sellers_products": sellers_product_serializer,
-            "total_page": total_page
+            "total_page": total_page,
+            "is_grouped" : is_grouped
         }, status=status.HTTP_200_OK)
 
     # url = /seller/product
     def post(self, request: Request) -> Response:
         try:
-            product_data_list = []
-            detail_image_data = {}
-
-            for index, data in enumerate(request.data):
-                if Product.objects.last():
-                    product_id = Product.objects.last().id
-                else:
-                    product_id = 0
-                product_data_list.append(
-                    Product(
-                        product_id + index + 1,  # id
-                        request.user.id,  # seller
-                        data["category"],  # category
-                        data["product_group_name"],  # product_group_name
-                        data["product_name"],  # product_name
-                        data["payment_term"],  # payment_term
-                        "",  # register_date
-                        "",  # update_date
-                        data["price"],  # price
-                        data["image"],  # image
-                        data["description"],  # description
-                    )
+            product_obj_list = []
+            detail_image_list = []
+            for data in request.data:
+                product_obj = Product(
+                    seller = User.objects.get(id = 1),  # seller
+                    category = Category.objects.get(id = int(data["category"])),  # category
+                    product_group_name = data["product_group_name"],  # product_group_name
+                    product_name = data["product_name"],  # product_name
+                    payment_term = PaymentTerm.objects.get(id = int(data["payment_term"])),  # payment_term
+                    register_date = "",  # register_date
+                    update_date = "",  # update_date
+                    price = data["price"],  # price
+                    image = data["image"],  # image
+                    description = data["description"],  # description
                 )
-                # detail_image에 대한 처리를 {product_id : detail_image}로 구성
-                detail_image_dict = {
-                    str(product_id + index + 1): str(data.pop("detail_images"))}
-                detail_image_dict = {**detail_image_data, **detail_image_dict}
-
-            Product.objects.bulk_create(product_data_list)
-
-            detail_images_list = []
-
-            for product_id, images in detail_image_dict.items():
-                for image in images:
-                    detail_images_list.append(
-                        ProductImages(
-                            image=image, product=Product.objects.get(id=product_id))
-                    )
-            ProductImages.objects.bulk_create(detail_images_list)
+                
+                product_obj_list.append(product_obj)
+                
+                
+                for detail_image in data["detail_images"]:
+                    detail_image_obj = ProductImages(image = detail_image, product = product_obj)
+                    detail_image_list.append(detail_image_obj)
+            Product.objects.bulk_create(product_obj_list)
+            ProductImages.objects.bulk_create(detail_image_list)
+            
 
             return Response({"detail": "상품이 등록 되었습니다."}, status=status.HTTP_201_CREATED)
         except exceptions.ValidationError as e:
             error_message = "".join(
                 [str(value) for values in e.detail.values() for value in values])
             return Response({"detail": error_message}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        

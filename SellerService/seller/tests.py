@@ -10,13 +10,17 @@ from sharedb.models import (
     PaymentTerm,
     Product,
     User)
+
+
 from seller.views import STANDARD_NUM_OF_PRODUCTS
+PAGE_NUM = 1
+
 
 pytestmark = pytest.mark.django_db
 
 
 class TestProductView():
-    @pytest.mark.skip()
+    # @pytest.mark.skip()
     def test_Create_Product(self, CreateCategories,
                             CreateSignupMethod, CreateUser,
                             CreatePaymentTerm, client):
@@ -54,13 +58,13 @@ class TestProductView():
             request_data), content_type="application/json")
         assert resp.status_code == status.HTTP_201_CREATED
 
+    @pytest.mark.skip()
     def test_Read_Product(self, CreateCategories,
                           CreateSignupMethod, CreateUser, CreatePaymentTerm,
                           CreateProductImages, CreateProducts, client):
 
-        PAGE_NUM = 1
-
-        url = "/seller/product/1?page=" + str(PAGE_NUM) + "&filter=" + "views"
+        url = "/seller/product/1?page=" + \
+            str(PAGE_NUM) + "&filter=" + "views" + "&group_name=" + "돼지좋아"
 
         user1 = User.objects.get(id=1)
         client.force_login(user1)
@@ -68,6 +72,7 @@ class TestProductView():
 
         sellers_products = resp.data['sellers_products']
         total_page = resp.data['total_page']
+        is_grouped = resp.data['is_grouped']
 
         sellers_products_len = len(sellers_products)
 
@@ -76,4 +81,5 @@ class TestProductView():
         assert sellers_products_len <= STANDARD_NUM_OF_PRODUCTS
         assert total_page * STANDARD_NUM_OF_PRODUCTS >= all_product_count
         assert sellers_products[0]['views'] >= sellers_products[-1]['views']
+        assert is_grouped == True
         assert resp.status_code == 200
