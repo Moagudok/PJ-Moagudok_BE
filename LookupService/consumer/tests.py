@@ -107,8 +107,8 @@ class TestProductListbyText():
 - 총 상품 갯수 넘을 때 - 404
 - 총 상품 갯수 안넘을 때 - 200
 '''
-# @pytest.mark.skip()
-@pytest.mark.django_db
+@pytest.mark.skip()
+# @pytest.mark.django_db
 class TestProductDetail():
     def test_ProductDetail(self, CreateCategories, \
         CreateSignupMethod, CreateUser, CreatePaymentTerm, \
@@ -121,4 +121,86 @@ class TestProductDetail():
         resp = client.get("/consumer/product/detail/"+str(product_num+1))
         assert resp.data == ErrorDetail(string = '존재하지 않는 구독 상품 입니다.', code=404)
         assert resp.status_code == 404
+        
+''' 홈 화면 TESTCODE - 1
+- 카테고리 모두 조회됬는지
+'''
+# @pytest.mark.django_db
+@pytest.mark.skip()
+class TestHomeCategory():
+    # 카테고리 TEST
+    def test_HomeCategoryList(self, CreateCategories, client):
+        resp = client.get("/consumer/home/")
+        assert len(resp.data['categories'])==12, "Num of Category is invalid"
+        assert resp.status_code == 200
+
+''' 홈 화면 TESTCODE - 2
+- 인기 상품 : 10개 넘을 때, 10개 안넘을 떄 다 잘 출력되는지
+- 인기 상품 : 상품 리스트 중 앞 상품 구독자가 뒤 상품 구독자보다 많은지 
+'''
+# @pytest.mark.django_db
+@pytest.mark.skip()
+class TestHomePopularProducts():
+    # 인기 상품 TEST - 상품 갯수 많은
+    def test_HomePopularProductList(self, CreateCategories, \
+        CreateSignupMethod, CreateUser, CreatePaymentTerm, \
+        CreateProducts, CreateProductImages, client):
+
+        STANDARD_NUM_OF_PRODUCTS = 10 # 기본 제공 상품 갯수
+
+        resp = client.get("/consumer/home/")
+        popular_products = resp.data['popular_products']
+        popular_products_len = len(popular_products)
+        assert popular_products_len >= STANDARD_NUM_OF_PRODUCTS
+        assert popular_products[0]['num_of_subscribers'] >= popular_products[popular_products_len-1]['num_of_subscribers']
+        assert resp.status_code == 200
+
+    # @pytest.mark.skip()
+    # 인기 상품 TEST - 상품 갯수 적은
+    def test_HomePopularProductSmallList(self, CreateCategories, \
+        CreateSignupMethod, CreateUser, CreatePaymentTerm, \
+        CreateSmallProducts, CreateSmallProductImages, client):
+
+        STANDARD_NUM_OF_PRODUCTS = 10 # 기본 제공 상품 갯수
+
+        resp = client.get("/consumer/home/")
+        popular_products = resp.data['popular_products']
+        popular_products_len = len(popular_products)
+        assert popular_products_len < STANDARD_NUM_OF_PRODUCTS
+        assert popular_products[0]['num_of_subscribers'] >= popular_products[popular_products_len-1]['num_of_subscribers']
+        assert resp.status_code == 200
+
+''' 홈 화면 TESTCODE - 3
+- 신규 상품 : UPDATE 날짜가 빠른 10개 상품 출력
+'''
+@pytest.mark.django_db
+# @pytest.mark.skip()
+class TestHomePopularProduct():
+    # 신규 상품 TEST - 상품 갯수 많은 
+    def test_HomeNewProductList(self, CreateCategories, \
+        CreateSignupMethod, CreateUser, CreatePaymentTerm, \
+        CreateProducts, CreateProductImages, client):
+
+        STANDARD_NUM_OF_PRODUCTS = 10 # 기본 제공 상품 갯수
+
+        resp = client.get("/consumer/home/")
+        new_products = resp.data['new_products']
+        new_products_len = len(new_products)
+        assert new_products_len >= STANDARD_NUM_OF_PRODUCTS
+        assert new_products[0]['update_date'] >= new_products[new_products_len-1]['update_date'] # '2022-11-09' > '2022-11-08' = True
+        assert resp.status_code == 200
+
+    # 신규 상품 TEST - 상품 갯수 적은 
+    def test_HomeNewProductSmallList(self, CreateCategories, \
+        CreateSignupMethod, CreateUser, CreatePaymentTerm, \
+        CreateSmallProducts, CreateSmallProductImages, client):
+
+        STANDARD_NUM_OF_PRODUCTS = 10 # 기본 제공 상품 갯수
+
+        resp = client.get("/consumer/home/")
+        new_products = resp.data['new_products']
+        new_products_len = len(new_products)
+        assert new_products_len < STANDARD_NUM_OF_PRODUCTS
+        assert new_products[0]['update_date'] >= new_products[new_products_len-1]['update_date'] # '2022-11-09' > '2022-11-08' = True
+        assert resp.status_code == 200
         
