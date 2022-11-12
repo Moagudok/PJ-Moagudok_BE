@@ -25,7 +25,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MODE = "LOCAL_TEST"
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+if MODE=="LOCAL_TEST" or MODE=='LOCAL':
+    SECRET_KEY = "django-insecure-h5%-%rv_n*jx%k6j-l&-luqhdx_9#k2kpi3y_!lpxjbo$!n+h$"
+else: # MODE = PRODUCTION
+    SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -57,6 +60,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google'
 ]
 
+SITE_ID = 1
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -65,7 +71,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'AuthService.urls'
@@ -81,7 +86,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                # 'social_django.context_processors.backends',
             ],
         },
     },
@@ -160,5 +164,22 @@ AUTH_USER_MODEL = "sharedb.User"
 
 # social app custom settings
 AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend',
-                        'allauth.account.auth_backends.AuthenticationBackend'
+                        'allauth.account.auth_backends.AuthenticationBackend'                
 ]
+
+# SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#         'SCOPE': [
+#             'profile',
+#             'email'
+#         ],
+#         'AUTH_PARAMS':{
+#             'access_type':'online',
+#         }
+#     }
+# }
+
+# LOGIN_REDIRECT_URL = '/'
+# LOGOUT_REDIRECT_URL = '/'
