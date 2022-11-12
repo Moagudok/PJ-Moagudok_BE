@@ -6,13 +6,13 @@ from rest_framework.exceptions import ErrorDetail
 
 from django.db.models import Q
 from sharedb.models import Category, Product
-from .serializers import ProductCategoryListSerializer, ProductListSerializer, ProductDetailSerializer
+from .serializers import CategoryListSerializer, ProductListSerializer, ProductDetailSerializer
 
 # url : /consumer/product/category
 class ProductCategoryListView(APIView):
     def get(self, request):
         category_data = Category.objects.all()
-        CategorySerializer_data = ProductCategoryListSerializer(category_data, many=True).data
+        CategorySerializer_data = CategoryListSerializer(category_data, many=True).data
         return Response(CategorySerializer_data, status.HTTP_200_OK)
 
 class ProductListPaginationClass(PageNumberPagination): # 
@@ -49,7 +49,32 @@ class ProductDeatilView(APIView):
         detail_product_data = ProductDetailSerializer(detail_product).data
         return Response(detail_product_data, status=status.HTTP_200_OK)
 
-        
+'''
+(2) 카테고리 - 맨 상단에 카테고리들 (좌우 스크롤) 모두 뿌려줌
+(3) 인기 상품 - 구독자 수 기반 인기 상품 출력 (구독자 수가 많을 수록 인기 상품)
+(4) 신규 상품 - 등록 날짜가 일주일 이내인 상품들 추천
+'''
+# url : /consumer/home/
+class HomeView(APIView):
+    def get(self, request):
+        categories = Category.objects.all()
+        popular_products = Product.objects.all().order_by('-num_of_subscribers')
+        new_products = Product.objects.all().order_by('-update_date')
+
+        STANDARD_NUM_OF_PRODUCTS = 10
+        PRODUCT_NUM = min(Product.objects.count(), STANDARD_NUM_OF_PRODUCTS) # 현재 Product 갯수가 NUM_OF_PRODUCTS (10) 보다 적을 때
+        popular_products = popular_products[:PRODUCT_NUM] # 내림차순 구독자 수
+        new_products = new_products[:PRODUCT_NUM] # 내림차순 update 기준 (-id도 가능)
+
+        categories_data = CategoryListSerializer(categories, many=True).data
+        popular_products_data = ProductListSerializer(popular_products, many=True).data
+        new_products_data = ProductListSerializer(new_products, many=True).data
+        return Response({
+                'categories':categories_data, 
+                'popular_products':popular_products_data, 
+                'new_products':new_products_data,
+            }, status=status.HTTP_200_OK)
+
 
 ''' legacy code 
 def list(self, request):

@@ -75,6 +75,12 @@ def CreateProducts():
         Product(8, 1, 3, '통조림가공식품', '참치셋트', 3, '2022-11-05', '2022-11-08', 15000, \
         	'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_processed_food_tuna.jpg','참치 통조림 다양하게 먹고 싶은 사람만~', \
 			22, 5),
+        Product(9, 1, 1, '뉴스 크롤링2', 'IT TOP 102', 2, '2022-11-08', '2022-11-08', 10100, \
+        	'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_crawling_news_it.jpg','주간 IT 헤드라인 TOP 10 뉴스 크롤링하여 전달해드립니다.2', \
+			50, 20),
+        Product(10, 1, 1, '뉴스 크롤링2', '정치 TOP 102', 1, '2022-11-09', '2022-11-09', 10100, \
+        	'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_crawling_news_politics.jpg','일일 정치 헤드라인 TOP 10 뉴스 크롤링하여 전달해드립니다.2', \
+			7, 3),
     ])
     print("Product is created")
 
@@ -89,3 +95,32 @@ def CreateProductImages():
         ProductImages(6, 'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_processed_food_tuna_detail1.jpg', 8),
     ])
     print("ProductImages is created")
+
+
+@pytest.fixture
+def CreateSmallProducts(): # 10개 미만
+    Product.objects.bulk_create([
+        Product(1, 1, 1, '뉴스 크롤링', 'IT TOP 10', 2, '2022-11-07', '2022-11-07', 10000, \
+        	'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_crawling_news_it.jpg','주간 IT 헤드라인 TOP 10 뉴스 크롤링하여 전달해드립니다.', \
+			5, 2),
+        Product(2, 1, 1, '증권 주가 통계 정보', '식량관련주', 1, '2022-11-06', '2022-11-06', 5000,\
+        	'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_stock_food.jpg','일일 식량관련주 통계 분석 하여 제공해드립니다.', \
+			35, 1),
+        Product(3, 1, 2, '돼지좋아', '삼목살', 2, '2022-11-05', '2022-11-06', 30000, \
+        	'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_meat_porkbelly.jpg','삼겹살 300g과 목살 300g 조합의 고기셋트', \
+			15, 42),
+        Product(4, 1, 3, '통조림가공식품', '스팸셋트', 3, '2022-11-03', '2022-11-04', 25000, \
+        	'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_processed_food_spam.jpg','스팸에 쌀밥 먹고 싶은 사람만~', \
+			31, 4),
+    ])
+    print("Small Product is created")
+
+@pytest.fixture
+def CreateSmallProductImages(): # 10개 미만
+    ProductImages.objects.bulk_create([
+        ProductImages(1, 'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_crawling_news_politics_detail1.jpg', 2),
+        ProductImages(2, 'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_crawling_news_politics_detail2.jpg', 2),
+        ProductImages(3, 'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_crawling_news_it_detail1.jpg', 1),
+        ProductImages(4, 'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_crawling_news_it_detail2.jpg', 1),
+    ])
+    print("Small ProductImages is created")
