@@ -1,16 +1,16 @@
 version: "3"
 services:
-  db:
-    image: postgres:latest
-    container_name: postgres
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_DB=postgres_db
-      - POSTGRES_USER=postgres_user
-      - POSTGRES_PASSWORD=root
-    volumes:
-      - ./postgres/:/var/lib/postgresql/data
+#  db:
+#    image: postgres:latest
+#    container_name: postgres
+#    ports:
+#      - "5433:5433"
+#    environment:
+#      - POSTGRES_DB=postgres_db
+#      - POSTGRES_USER=postgres_user
+#      - POSTGRES_PASSWORD=root
+#    volumes:
+#      - ./postgres/:/var/lib/postgresql/data
 
   app:
     container_name: spring
@@ -19,15 +19,22 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    depends_on:
-      - db
-    links:
-      - db
+#    depends_on:
+#      - localhost
+#    links:
+#      - db
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres_db
-      SPRING_DATASOURCE_USERNAME: postgres_user
-      SPRING_DATASOURCE_PASSWORD: root
-      SPRING.JPA.HIBERNATE.DDL-AUTO: update
+      - SPRING_DATASOURCE_DIVER-CLASS-NAME=org.postgresql.Driver
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/postgres
+      - SPRING_DATASOURCE_PLATFORM=postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING.JPA.HIBERNATE.DDL-AUTO=update
+      - SPRING.JPA.SHOW.SQL=true
+      - SPRING.JPA.DATABASE=postgresql
+      - SPRING.JPA.PROPERTIES.HIBERNATE.FORMAT_SQL=true
+      - SPRING.JPA.DATABASE-PLATFORM=org.hibernate.dialect.PostgreSQLDialect
+      - SPRING.JPA.GENERATE-DDL=true
 
 
 volumes:
