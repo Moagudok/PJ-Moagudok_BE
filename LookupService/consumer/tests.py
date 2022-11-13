@@ -173,8 +173,8 @@ class TestHomePopularProducts():
 ''' 홈 화면 TESTCODE - 3
 - 신규 상품 : UPDATE 날짜가 빠른 10개 상품 출력
 '''
-@pytest.mark.django_db
-# @pytest.mark.skip()
+# @pytest.mark.django_db
+@pytest.mark.skip()
 class TestHomePopularProduct():
     # 신규 상품 TEST - 상품 갯수 많은 
     def test_HomeNewProductList(self, CreateCategories, \
