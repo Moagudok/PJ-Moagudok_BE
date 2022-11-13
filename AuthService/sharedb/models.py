@@ -42,16 +42,18 @@ class UserManager(BaseUserManager):
 # User(소비자/판매자) Table
 class User(AbstractBaseUser):        
     email = models.EmailField("이메일", max_length=150, unique=True, null=False, blank=False)
-    name = models.CharField("이름", max_length=20)
+    name = models.CharField("이름", max_length=20, null=True)
     password = models.CharField("비밀번호", max_length=100)
-    address = models.CharField("주소", max_length=100)
+    address = models.CharField("주소", max_length=100, null=True)
     join_date = models.DateTimeField("가입일", auto_now_add=True)
     signup_method = models.ForeignKey(SignupMethod, verbose_name="가입방법", on_delete=models.SET_NULL, null=True)
     is_active = models.BooleanField(default=True) # 계정활성화 여부
     is_admin = models.BooleanField(default=False)
     is_seller = models.BooleanField(default=False) # 판매자 여부
-    USERNAME_FIELD = 'email' # 로그인 시 사용할 필드 지정
 
+    USERNAME_FIELD = 'email' # 로그인 시 사용할 필드 지정
+    REQUIRED_FIELDS = []
+    
     objects = UserManager() # custom user 생성 시 필요
 
     class Meta:

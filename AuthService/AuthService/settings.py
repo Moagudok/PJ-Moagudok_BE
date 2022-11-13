@@ -25,10 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MODE = "LOCAL_TEST"
 
 # SECURITY WARNING: keep the secret key used in production secret!
-if MODE=="LOCAL_TEST" or MODE=='LOCAL':
-    SECRET_KEY = "django-insecure-h5%-%rv_n*jx%k6j-l&-luqhdx_9#k2kpi3y_!lpxjbo$!n+h$"
-else: # MODE = PRODUCTION
-    SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -47,9 +44,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sharedb',
-    'rest_framework',
-    'rest_framework_simplejwt',
     'user',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
     
     #allauth
     'allauth',
@@ -60,7 +60,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google'
 ]
 
-SITE_ID = 1
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
 MIDDLEWARE = [
@@ -159,7 +158,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = "sharedb.User"
 
 
 # social app custom settings
@@ -167,19 +165,28 @@ AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend',
                         'allauth.account.auth_backends.AuthenticationBackend'                
 ]
 
-# SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+REST_FRAMEWORK = {
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    ),
+}
 
-# SOCIALACCOUNT_PROVIDERS = {
-#     'google': {
-#         'SCOPE': [
-#             'profile',
-#             'email'
-#         ],
-#         'AUTH_PARAMS':{
-#             'access_type':'online',
-#         }
-#     }
-# }
+AUTH_USER_MODEL = "sharedb.User"
 
-# LOGIN_REDIRECT_URL = '/'
-# LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None # username 필드 사용 x
+ACCOUNT_EMAIL_REQUIRED = True            # email 필드 사용 o
+ACCOUNT_USERNAME_REQUIRED = False        # username 필드 사용 x
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+
+SITE_ID=1
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
