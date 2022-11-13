@@ -14,7 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping({"/payment"})
 public class PaymentApiController {
+//    @GetMapping
+//    public String home(){
+//        return "Hello World";
+//    }
     private final PaymentService paymentService;
+
+    public PaymentApiController(final PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
 
     @PostMapping
     public Long save(@RequestBody final PaymentRequestDTO params) {
@@ -22,7 +30,7 @@ public class PaymentApiController {
     }
 
     @GetMapping
-    public List<PaymentResponseDTO> findAll() {
+    public List<PaymentRequestDTO> findAll() {
         return this.paymentService.findAll();
     }
 
@@ -36,7 +44,5 @@ public class PaymentApiController {
         return this.paymentService.findBySellerId(id);
     }
 
-    public PaymentApiController(final PaymentService paymentService) {
-        this.paymentService = paymentService;
-    }
+
 }

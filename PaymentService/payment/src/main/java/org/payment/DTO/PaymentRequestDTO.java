@@ -2,6 +2,7 @@ package org.payment.DTO;
 
 import java.time.LocalDate;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.payment.entity.Payment;
@@ -25,5 +26,19 @@ public class PaymentRequestDTO {
                 .consumerId(this.consumerId)
                 .sellerId(this.sellerId)
                 .build();
+    }
+    @Builder
+    public PaymentRequestDTO(Integer price,
+                   LocalDate subscription_date,
+                   LocalDate expiration_date,
+                   String payment_due,
+                   Long consumerId,
+                   Long sellerId) {
+        this.price = price;
+        this.subscription_date = subscription_date;
+        this.expiration_date = expiration_date;
+        this.payment_due = payment_due;
+        this.consumerId = consumerId;
+        this.sellerId = sellerId;
     }
 }

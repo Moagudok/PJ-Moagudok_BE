@@ -5,11 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "Payment")
@@ -19,11 +15,17 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column
     private Integer price;
+    @Column
     private LocalDate subscription_date;
+    @Column
     private LocalDate expiration_date;
+    @Column
     private String payment_due;
+    @Column
     private Long consumerId;
+    @Column
     private Long sellerId;
 
     @Builder
