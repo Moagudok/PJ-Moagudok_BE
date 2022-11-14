@@ -16,18 +16,25 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
+## TEST MODE
+# LOCAL_TEST : TEST CODE 작성시
+# LOCAL : 로컬 서버 돌릴 때 
+# PRODUCTION : 배포용
+MODE = "LOCAL_TEST"
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+if MODE=="LOCAL_TEST" or MODE=='LOCAL':
+    SECRET_KEY = "django-insecure-h!ojgwre1e58)16&bmuve3mn#dnll#dt&eoo14!rq2s3bffkn2"
+else: # MODE = PRODUCTION
+    SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+if MODE == 'PRODUCTION':
+    ALLOWED_HOSTS = ["*"]
+else: # MODE = LOCAL or LOCAL_TEST
+    ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -39,7 +46,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sharedb',
+    "consumer",
+    "search",
+    'rest_framework',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS' : 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE' : 2,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -85,17 +100,40 @@ DATABASES = {
 '''
 
 # PostgreSQL
-DATABASES = {
-    'default': {
-        'ENGINE': os.environ.get("DB_ENGINE"),
-        'NAME': os.environ.get("DB_NAME"), # Schema Name
-        'USER': os.environ.get("DB_USER"),
-        'PASSWORD': os.environ.get("DB_PASSWORD"), # PASSWORD NAME
-        'HOST':os.environ.get("DB_HOST"),
-        'PORT':os.environ.get("DB_PORT"),
+if MODE == 'LOCAL_TEST':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'moa_gudok', # Schema Name
+            'USER': 'postgres', 
+            'PASSWORD': 'rlatjsals1!', # PASSWORD
+            'HOST': '127.0.0.1', 
+            'PORT': '5432', 
+        }
     }
-}
-
+elif MODE == 'PRODUCTION':
+    DATABASES = {
+        'default': {
+            'ENGINE': os.environ.get("PRODUCTION_ENGINE"),
+            'NAME': os.environ.get("PRODUCTION_NAME"), # Schema Name
+            'USER': os.environ.get("PRODUCTION_USER"),
+            'PASSWORD': os.environ.get("PRODUCTION_PASSWORD"), # PASSWORD
+            'HOST':os.environ.get("PRODUCTION_HOST"),
+            'PORT':os.environ.get("PRODUCTION_PORT"),
+        }
+    }
+# NOT TESTING MODE
+else: # MODE=LOCAL
+    DATABASES = {
+        'default': {
+            'ENGINE': os.environ.get("DB_ENGINE"),
+            'NAME': os.environ.get("DB_NAME"), # Schema Name
+            'USER': os.environ.get("DB_USER"),
+            'PASSWORD': os.environ.get("DB_PASSWORD"), # PASSWORD NAME
+            'HOST':os.environ.get("DB_HOST"),
+            'PORT':os.environ.get("DB_PORT"),
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -121,11 +159,12 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
+USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False  # 원래 True KOREA Time을 위한 False 설정
 
 
 # Static files (CSS, JavaScript, Images)

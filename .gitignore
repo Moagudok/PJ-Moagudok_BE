@@ -1,4 +1,8 @@
 __pycache__/
+.pytest_cache/
 migrations/
 db.sqlite3
 *.env
+venv
+.vscode/settings.json
+PaymentService/payment/postgres/
