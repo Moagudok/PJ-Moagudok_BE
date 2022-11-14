@@ -8,11 +8,7 @@ class CategoryListSerializer(serializers.ModelSerializer):
 
 # 구독 상품 카드형 정보
 class ProductListSerializer(serializers.ModelSerializer):
-    seller = serializers.SerializerMethodField()
     payment_term = serializers.SerializerMethodField()
-
-    def get_seller(self, obj):
-        return obj.seller.name
 
     def get_payment_term(self, obj):
         return obj.payment_term.unit
@@ -20,9 +16,8 @@ class ProductListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            "seller", "product_group_name", 
-            "product_name", "payment_term", "price", 
-            "image", "description", "views", "num_of_subscribers",'update_date',
+            "id", "product_group_name", 
+            "product_name", "payment_term", "price", "image"
         ]
 
 # 구독 상품 상세 이미지 정보
@@ -50,7 +45,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            "seller", "category", "product_group_name", "product_name",
-            "payment_term", "price", "image", "description", "productimages",
-            "views", "num_of_subscribers",
+            "id", "seller", "category", "product_group_name", "product_name",
+            "payment_term", "register_date", "update_date", "price", "image",
+            "description", "productimages", "views", "num_of_subscribers",
         ]
