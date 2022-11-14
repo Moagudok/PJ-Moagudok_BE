@@ -19,15 +19,18 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    depends_on:
-      - db
-    links:
-      - db
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres_db
-      SPRING_DATASOURCE_USERNAME: postgres_user
-      SPRING_DATASOURCE_PASSWORD: root
-      SPRING.JPA.HIBERNATE.DDL-AUTO: update
+      - SPRING_DATASOURCE_DIVER-CLASS-NAME=org.postgresql.Driver
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+      - SPRING_DATASOURCE_PLATFORM=postgres
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING.JPA.HIBERNATE.DDL-AUTO=${DB_DDL_AUTO}
+      - SPRING.JPA.SHOW.SQL=true
+      - SPRING.JPA.DATABASE=postgresql
+      - SPRING.JPA.PROPERTIES.HIBERNATE.FORMAT_SQL=true
+      - SPRING.JPA.DATABASE-PLATFORM=org.hibernate.dialect.PostgreSQLDialect
+      - SPRING.JPA.GENERATE-DDL=true
 
 
 volumes:
