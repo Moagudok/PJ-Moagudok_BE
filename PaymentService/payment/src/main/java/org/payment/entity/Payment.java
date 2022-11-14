@@ -4,12 +4,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.time.LocalDate;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "Payment")
@@ -19,15 +15,26 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column
     private Integer price;
-    private Date subscription_date;
-    private Date expiration_date;
-    private Date payment_due;
+    @Column
+    private LocalDate subscription_date;
+    @Column
+    private LocalDate expiration_date;
+    @Column
+    private String payment_due;
+    @Column
     private Long consumerId;
+    @Column
     private Long sellerId;
 
     @Builder
-    public Payment(Integer price, Date subscription_date, Date expiration_date, Date payment_due, Long consumerId, Long sellerId) {
+    public Payment(Integer price,
+                   LocalDate subscription_date,
+                   LocalDate expiration_date,
+                   String payment_due,
+                   Long consumerId,
+                   Long sellerId) {
         this.price = price;
         this.subscription_date = subscription_date;
         this.expiration_date = expiration_date;
@@ -35,5 +42,7 @@ public class Payment {
         this.consumerId = consumerId;
         this.sellerId = sellerId;
     }
+
+
 
 }
