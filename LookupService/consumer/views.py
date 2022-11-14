@@ -37,7 +37,6 @@ class ProductListPaginationViewSet(viewsets.ModelViewSet):
         query_set = self.queryset.filter(condition)
         return query_set
 
-
 # url : /consumer/product/detail/{product_id}
 class ProductDeatilView(APIView):
     def get(self, request, product_id):
@@ -50,9 +49,9 @@ class ProductDeatilView(APIView):
         return Response(detail_product_data, status=status.HTTP_200_OK)
 
 '''
-(2) 카테고리 - 맨 상단에 카테고리들 (좌우 스크롤) 모두 뿌려줌
-(3) 인기 상품 - 구독자 수 기반 인기 상품 출력 (구독자 수가 많을 수록 인기 상품)
-(4) 신규 상품 - 등록 날짜가 일주일 이내인 상품들 추천
+(1) 카테고리 - 맨 상단에 카테고리들 (좌우 스크롤) 모두 뿌려줌
+(2) 인기 상품 - 구독자 수 기반 인기 상품 출력 (구독자 수가 많을 수록 인기 상품)
+(3) 신규 상품 - 등록 날짜가 일주일 이내인 상품들 추천
 '''
 # url : /consumer/home/
 class HomeView(APIView):
