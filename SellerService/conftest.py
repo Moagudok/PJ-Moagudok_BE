@@ -77,6 +77,8 @@ def CreateProductImages():
             15, 'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_processed_food_spam_detail1.jpg', 17),
         ProductImages(
             16, 'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_processed_food_tuna_detail1.jpg', 18),
+        ProductImages(
+            17, 'https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Ff39e8755-f73b-4199-bbd7-a9301a0df299%2FUntitled.png?table=block&id=7c6c3e3b-90d1-429e-b7e9-ef3ece1bab41&spaceId=37dd6269-774e-4741-aba2-448c2fe9ab02&width=2000&userId=b6877bc7-a03e-4708-815c-2ace04f89c71&cache=v2', 15),
     ])
     print("ProductImages is created")
 

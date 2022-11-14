@@ -85,6 +85,7 @@ class Product(models.Model):
     description = models.TextField("상품 설명")
     views = models.PositiveIntegerField("상품 조회 수", default=0)
     num_of_subscribers = models.PositiveIntegerField("구독자 수", default=0)
+    is_active = models.BooleanField("활성화 여부", default=True)
     
     class Meta:
         db_table = 'Product'
