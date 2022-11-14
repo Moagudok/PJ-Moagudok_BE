@@ -44,23 +44,21 @@ services:
     env_file:
       - ./SellerService/.local.env
 
-  # payment_service:
-  #   container_name: spring
-  #   build:
-  #     context: .
-  #     dockerfile: ./PaymentService/payment/Dockerfile
-  #   ports:
-  #     - 8080:8080
-  #   expose:
-  #     - 8080
-  #   env_file:
-  #    - ./PaymentService/payment/.pro.env
-  #   environment:
-  #     - SPRING_DATASOURCE_DIVER-CLASS-NAME=org.postgresql.Driver
-  #     - SPRING_DATASOURCE_PLATFORM=postgres
-  #     - SPRING.JPA.SHOW.SQL=true
-  #     - SPRING.JPA.DATABASE=postgresql
-  #     - SPRING.JPA.PROPERTIES.HIBERNATE.FORMAT_SQL=true
-  #     - SPRING.JPA.DATABASE-PLATFORM=org.hibernate.dialect.PostgreSQLDialect
-  #     - SPRING.JPA.GENERATE-DDL=true
+  payment_service:
+    container_name: spring
+    build: ./PaymentService/payment/
+    ports:
+      - 8080:8080
+    expose:
+      - 8080
+    env_file:
+     - ./PaymentService/payment/.pro.env
+    environment:
+      - SPRING_DATASOURCE_DIVER-CLASS-NAME=org.postgresql.Driver
+      - SPRING_DATASOURCE_PLATFORM=postgres
+      - SPRING.JPA.SHOW.SQL=true
+      - SPRING.JPA.DATABASE=postgresql
+      - SPRING.JPA.PROPERTIES.HIBERNATE.FORMAT_SQL=true
+      - SPRING.JPA.DATABASE-PLATFORM=org.hibernate.dialect.PostgreSQLDialect
+      - SPRING.JPA.GENERATE-DDL=true
     
