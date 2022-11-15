@@ -9,19 +9,21 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Getter
 public class PaymentResponseDTO {
     private Long id;
+    private Long productId;
     private Integer price;
-    private LocalDate subscription_date;
-    private LocalDate expiration_date;
-    private String payment_due;
+    private LocalDate subscriptionDate;
+    private LocalDate expirationDate;
+    private String paymentDue;
     private Long consumerId;
     private Long sellerId;
 
     public PaymentResponseDTO(Payment entity) {
+        this.productId = entity.getProductId();
         this.id = entity.getId();
         this.price = entity.getPrice();
-        this.subscription_date = entity.getSubscription_date();
-        this.expiration_date = entity.getExpiration_date();
-        this.payment_due = entity.getPayment_due();
+        this.subscriptionDate = entity.getSubscriptionDate();
+        this.expirationDate = entity.getExpirationDate();
+        this.paymentDue = entity.getPaymentDue();
         this.consumerId = entity.getConsumerId();
         this.sellerId = entity.getSellerId();
     }

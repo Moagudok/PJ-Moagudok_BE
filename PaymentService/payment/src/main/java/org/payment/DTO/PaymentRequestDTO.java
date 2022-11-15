@@ -10,34 +10,39 @@ import org.payment.entity.Payment;
 @Getter
 @NoArgsConstructor
 public class PaymentRequestDTO {
+    private Long productId;
     private Integer price;
-    private LocalDate subscription_date;
-    private LocalDate expiration_date;
-    private String payment_due;
+    private LocalDate subscriptionDate;
+    private LocalDate expirationDate;
+    private String paymentDue;
     private Long consumerId;
     private Long sellerId;
 
     public Payment toEntity() {
         return Payment.builder()
+                .productId(this.productId)
                 .price(this.price)
-                .subscription_date(this.subscription_date)
-                .expiration_date(this.expiration_date)
-                .payment_due(this.payment_due)
+                .subscriptionDate(this.subscriptionDate)
+                .expirationDate(this.expirationDate)
+                .paymentDue(this.paymentDue)
                 .consumerId(this.consumerId)
                 .sellerId(this.sellerId)
                 .build();
     }
     @Builder
-    public PaymentRequestDTO(Integer price,
-                   LocalDate subscription_date,
-                   LocalDate expiration_date,
-                   String payment_due,
+    public PaymentRequestDTO(
+                   Long productId,
+                   Integer price,
+                   LocalDate subscriptionDate,
+                   LocalDate expirationDate,
+                   String paymentDue,
                    Long consumerId,
                    Long sellerId) {
+        this.productId = productId;
         this.price = price;
-        this.subscription_date = subscription_date;
-        this.expiration_date = expiration_date;
-        this.payment_due = payment_due;
+        this.subscriptionDate = subscriptionDate;
+        this.expirationDate = expirationDate;
+        this.paymentDue = paymentDue;
         this.consumerId = consumerId;
         this.sellerId = sellerId;
     }

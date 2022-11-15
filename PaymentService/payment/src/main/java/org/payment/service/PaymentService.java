@@ -1,6 +1,8 @@
 package org.payment.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
@@ -14,48 +16,45 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
-    @Autowired
-    private PaymentRepository paymentRepository;
+    private final PaymentRepository paymentRepository;
 
     @Transactional
-    public Long save(final PaymentRequestDTO params) {
-        Payment entity = (Payment)this.paymentRepository.save(params.toEntity());
-        return entity.getId();
+    public Long save(PaymentRequestDTO params) {
+        return paymentRepository.save(params.toEntity()).getId();
     }
-
     @Transactional
-    public List<PaymentRequestDTO> findAll() {
-        List<Payment> paymentList = paymentRepository.findAll();
-        List<PaymentRequestDTO> paymentRequestDTOList = new ArrayList<>();
-
-        for (Payment payment : paymentList){
-            PaymentRequestDTO paymentRequestDTO = PaymentRequestDTO.builder()
-                    .price(payment.getPrice())
-                    .subscription_date(payment.getSubscription_date())
-                    .expiration_date(payment.getExpiration_date())
-                    .payment_due(payment.getPayment_due())
-                    .consumerId(payment.getConsumerId())
-                    .sellerId(payment.getSellerId())
-                    .build();
-            paymentRequestDTOList.add(paymentRequestDTO);
-        }
-        return paymentRequestDTOList;
+    public List<Payment> findAll() {
+        return paymentRepository.findAll();
     }
-
     @Transactional
-    public List<PaymentResponseDTO> findByConsumerId(Long consumerId) {
-        List<Payment> list = this.paymentRepository.findAllByConsumerId(consumerId);
-        return list.stream().map(PaymentResponseDTO::new).collect(Collectors.toList());
+    public List<Payment> findByConsumerId(Long consumerId){
+        return paymentRepository.findByConsumerId(consumerId);
+    }
+    @Transactional
+    public List<Payment> findBySellerId(Long sellerId){
+        return paymentRepository.findBySellerId(sellerId);
+    }
+    @Transactional
+    public List<Payment> findByConsumerIdAndExpirationDateGreaterThan(Long consumerId, LocalDate localDate){
+        return paymentRepository.findByConsumerIdAndExpirationDateGreaterThan(consumerId, localDate);
+    }
+    @Transactional
+    public List<Payment> findByConsumerIdAndExpirationDateIs(Long consumerId, LocalDate localDate){
+        return paymentRepository.findByConsumerIdAndExpirationDateIs(consumerId, localDate);
+    }
+    @Transactional
+    public List<Payment> findByConsumerIdAndExpirationDateLessThan(Long consumerId, LocalDate localDate){
+        return paymentRepository.findByConsumerIdAndExpirationDateLessThan(consumerId, localDate);
     }
 
-    @Transactional
-    public List<PaymentResponseDTO> findBySellerId(Long sellerId) {
-        List<Payment> list = this.paymentRepository.findAllBySellerId(sellerId);
-        return list.stream().map(PaymentResponseDTO::new).collect(Collectors.toList());
-    }
+
+
+
+
 
 }
