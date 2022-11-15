@@ -16,29 +16,33 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column
+    private Long productId;
+    @Column
     private Integer price;
     @Column
-    private LocalDate subscription_date;
+    private LocalDate subscriptionDate;
     @Column
-    private LocalDate expiration_date;
+    private LocalDate expirationDate;
     @Column
-    private String payment_due;
+    private String paymentDue;
     @Column
     private Long consumerId;
     @Column
     private Long sellerId;
 
     @Builder
-    public Payment(Integer price,
-                   LocalDate subscription_date,
-                   LocalDate expiration_date,
-                   String payment_due,
+    public Payment(Long productId,
+                   Integer price,
+                   LocalDate subscriptionDate,
+                   LocalDate expirationDate,
+                   String paymentDue,
                    Long consumerId,
                    Long sellerId) {
+        this.productId = productId;
         this.price = price;
-        this.subscription_date = subscription_date;
-        this.expiration_date = expiration_date;
-        this.payment_due = payment_due;
+        this.subscriptionDate = subscriptionDate;
+        this.expirationDate = expirationDate;
+        this.paymentDue = paymentDue;
         this.consumerId = consumerId;
         this.sellerId = sellerId;
     }
