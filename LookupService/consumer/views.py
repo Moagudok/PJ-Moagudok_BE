@@ -4,7 +4,8 @@ from rest_framework import viewsets, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.exceptions import ErrorDetail
 
-from django.db.models import Q
+from django.db import transaction
+from django.db.models import Q, F
 from sharedb.models import Category, Product
 from .serializers import CategoryListSerializer, ProductListSerializer, ProductDetailSerializer
 
@@ -38,15 +39,38 @@ class ProductListPaginationViewSet(viewsets.ModelViewSet):
         return query_set
 
 # url : /consumer/product/detail/{product_id}
-class ProductDeatilView(APIView):
+class ProductDetailView(APIView):
+    @transaction.atomic
     def get(self, request, product_id):
+        DEBUG = True # 쿠키값, json 값 확인을 위한 parameter
+
+        COOKIE_KEY_NAME = 'visitedproduct'
+        EXPIRED_TIME = 5
+        cookies = request.headers['Cookie'].split(';')
+
+        if DEBUG: print(cookies)
+        p_num_list = [int(cookie.strip().replace(COOKIE_KEY_NAME, '').replace('=T','')) for cookie in cookies if COOKIE_KEY_NAME in cookie]
+        
         try:
+            # GET product
             detail_product = Product.objects.get(id = product_id)
+
+            # 방문이력 x
+            if product_id not in p_num_list:
+                detail_product.views = F("views") + 1
+                detail_product.save()
+                detail_product.refresh_from_db()
         except:
             return Response(ErrorDetail(string = '존재하지 않는 구독 상품 입니다.', code=404), status=status.HTTP_404_NOT_FOUND)
 
         detail_product_data = ProductDetailSerializer(detail_product).data
-        return Response(detail_product_data, status=status.HTTP_200_OK)
+
+        # Response Cookie Settings
+        response = Response(detail_product_data, status=status.HTTP_200_OK)
+        response.set_cookie(
+            key = 'visitedproduct'+str(product_id), value='T', max_age = EXPIRED_TIME
+        )
+        return response
 
 '''
 (1) 카테고리 - 맨 상단에 카테고리들 (좌우 스크롤) 모두 뿌려줌
@@ -73,7 +97,6 @@ class HomeView(APIView):
                 'popular_products':popular_products_data, 
                 'new_products':new_products_data,
             }, status=status.HTTP_200_OK)
-
 
 ''' legacy code 
 def list(self, request):
