@@ -1,6 +1,11 @@
 HELP.md
 .gradle
-build/
+build/classes
+build/generated
+build/resources
+build/tmp
+build/bootJarMainClassName
+
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/

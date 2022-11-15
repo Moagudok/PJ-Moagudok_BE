@@ -1,6 +1,7 @@
 import pytest
 from sharedb.models import Category, Product
 from rest_framework.exceptions import ErrorDetail
+import time
 
 ''' 카테고리 리스트 조회 화면 TESTCODE
 결함 TEST 위주
@@ -107,21 +108,34 @@ class TestProductListbyText():
 - 총 상품 갯수 넘을 때 - 404
 - 총 상품 갯수 안넘을 때 - 200
 '''
-@pytest.mark.skip()
-# @pytest.mark.django_db
+# @pytest.mark.skip()
+@pytest.mark.django_db
 class TestProductDetail():
     def test_ProductDetail(self, CreateCategories, \
         CreateSignupMethod, CreateUser, CreatePaymentTerm, \
         CreateProducts, CreateProductImages, client):
         
+
         product_num = Product.objects.count()
         resp = client.get("/consumer/product/detail/"+str(product_num))
         assert resp.status_code == 200
-
+        
         resp = client.get("/consumer/product/detail/"+str(product_num+1))
         assert resp.data == ErrorDetail(string = '존재하지 않는 구독 상품 입니다.', code=404)
         assert resp.status_code == 404
+
+        product_num = Product.objects.count()
+        resp = client.get("/consumer/product/detail/"+str(product_num))
+        assert resp.status_code == 200
         
+        # 조회수 체크
+        resp = client.get("/consumer/product/detail/"+str(product_num))
+        prev_hit_num = resp.data['views'] # 이전 조회수
+        resp = client.get("/consumer/product/detail/"+str(product_num))
+        re_hit_num = resp.data['views'] # 바로 재접근시 조회수
+        assert prev_hit_num == re_hit_num
+
+
 ''' 홈 화면 TESTCODE - 1
 - 카테고리 모두 조회됬는지
 '''
