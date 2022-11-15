@@ -9,7 +9,7 @@ services:
 #      - auth_service
       - lookup_service
       - seller_service
-      - payment_service
+      # - payment_service
 
   # auth_service:
   #   build: ./AuthService/
