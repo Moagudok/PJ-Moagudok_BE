@@ -104,16 +104,30 @@ DATABASES = {
 '''
 
 # PostgreSQL
-DATABASES = {
-    'default': {
-        'ENGINE': os.environ.get("DB_ENGINE"),
-        'NAME': os.environ.get("DB_NAME"), # Schema Name
-        'USER': os.environ.get("DB_USER"),
-        'PASSWORD': os.environ.get("DB_PASSWORD"), # PASSWORD NAME
-        'HOST':os.environ.get("DB_HOST"),
-        'PORT':os.environ.get("DB_PORT"),
+if MODE == 'PRODUCTION':
+    DATABASES = {
+        'default': {
+            'ENGINE': os.environ.get("PRODUCTION_ENGINE"),
+            'NAME': os.environ.get("PRODUCTION_NAME"), # Schema Name
+            'USER': os.environ.get("PRODUCTION_USER"),
+            'PASSWORD': os.environ.get("PRODUCTION_PASSWORD"), # PASSWORD
+            'HOST':os.environ.get("PRODUCTION_HOST"),
+            'PORT':os.environ.get("PRODUCTION_PORT"),
+        }
     }
-}
+# NOT TESTING MODE
+else: # MODE=LOCAL
+    DATABASES = {
+        'default': {
+            'ENGINE': os.environ.get("DB_ENGINE"),
+            'NAME': os.environ.get("DB_NAME"), # Schema Name
+            'USER': os.environ.get("DB_USER"),
+            'PASSWORD': os.environ.get("DB_PASSWORD"), # PASSWORD NAME
+            'HOST':os.environ.get("DB_HOST"),
+            'PORT':os.environ.get("DB_PORT"),
+        }
+    }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
