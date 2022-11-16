@@ -7,6 +7,8 @@ from sharedb.models import User as UserModel
 from .serializers import UserSerializer
 
 
+
+
 # user/cjoin
 class ConsumerJoinView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -20,7 +22,6 @@ class ConsumerJoinView(APIView):
 
 # user/sjoin
 class SellerJoinView(APIView):
-    permission_classes = [permissions.AllowAny]
     
     def post(self, request):
         request.data['is_seller'] = True
@@ -34,7 +35,7 @@ class SellerJoinView(APIView):
 # user
 class UserAPIView(APIView):
     # JWT 인증방식 클래스 지정하기
-    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.AllowAny]
     
     # 로그인 한 유저 정보 출력
     def get(self, request):
