@@ -51,7 +51,12 @@ class ProductDetailView(APIView):
             return Response(ErrorDetail(string = '존재하지 않는 구독 상품 입니다.', code=404), status=status.HTTP_404_NOT_FOUND)
 
         # Cookies 존재 여부 체크
-        cookies = request.headers['Cookie']
+        try: # cookie 없으면 None
+            cookies = request.headers['Cookie']
+        except:
+            cookies = None
+
+        # Cookies 존재시
         if cookies:
             cookies = cookies.split(';')
             if DEBUG: print('Cookies List : ', cookies)
