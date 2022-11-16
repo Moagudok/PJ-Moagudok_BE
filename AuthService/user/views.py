@@ -7,7 +7,7 @@ from sharedb.models import User as UserModel
 from .serializers import UserSerializer
 
 
-# user/cjoin/
+# user/cjoin
 class ConsumerJoinView(APIView):
     permission_classes = [permissions.AllowAny]
     
@@ -18,7 +18,7 @@ class ConsumerJoinView(APIView):
             return Response({"user" : user_serializer.data, "msg" : "회원가입 완료"}, status=status.HTTP_201_CREATED)
         return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# user/sjoin/
+# user/sjoin
 class SellerJoinView(APIView):
     permission_classes = [permissions.AllowAny]
     
@@ -31,7 +31,7 @@ class SellerJoinView(APIView):
         return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# user/
+# user
 class UserAPIView(APIView):
     # JWT 인증방식 클래스 지정하기
     authentication_classes = [JWTAuthentication]

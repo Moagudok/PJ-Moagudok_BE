@@ -25,7 +25,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MODE = "LOCAL_TEST"
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+if MODE=="LOCAL_TEST" or MODE=='LOCAL':
+    SECRET_KEY = "django-insecure-h!ojgwre1e58)16&bmuve3mn#dnll#dt&eoo14!rq2s3bffkn2"
+else: # MODE = PRODUCTION
+    SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
