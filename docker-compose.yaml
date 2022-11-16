@@ -6,21 +6,21 @@ services:
     ports:
       - 80:80
     depends_on:
-#      - auth_service
+      - auth_service
       - lookup_service
       - seller_service
       - payment_service
 
-  # auth_service:
-  #   build: ./AuthService/
-  #   command: gunicorn AuthService.wsgi:application --bind 0.0.0.0:8000
-  #   ports:
-  #     - 8000:8000
-  #   working_dir: /AuthService/
-  #   expose:
-  #     - 8000
-  #   env_file:
-  #     - ./.local.env
+  auth_service:
+    build: ./AuthService/
+    command: gunicorn AuthService.wsgi:application --bind 0.0.0.0:8000
+    ports:
+      - 8000:8000
+    working_dir: /AuthService/
+    expose:
+      - 8000
+    env_file:
+      - ./.local.env
 
   lookup_service:
     build: ./LookupService/
