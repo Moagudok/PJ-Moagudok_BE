@@ -1,2 +1,8 @@
 import pytest
-from sharedb.models import Category, ProductImages, Product, User, SignupMethod, PaymentTerm
+from sharedb.models import User
+
+def func(x):
+    return x + 1
+
+def test_answer():
+    assert func(3) == 4
