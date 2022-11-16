@@ -173,9 +173,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # social app custom settings
-AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend',
-                        'allauth.account.auth_backends.AuthenticationBackend'                
-]
+# AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend',
+                        # 'allauth.account.auth_backends.AuthenticationBackend'                
+# ]
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [ # 기본적인 view 접근 권한 지정
