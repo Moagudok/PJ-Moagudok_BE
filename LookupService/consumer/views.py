@@ -50,30 +50,32 @@ class ProductDetailView(APIView):
         except:
             return Response(ErrorDetail(string = '존재하지 않는 구독 상품 입니다.', code=404), status=status.HTTP_404_NOT_FOUND)
 
-        # Cookies 존재 여부 체크
-        try: # cookie 없으면 None
+        # Cookies에 담긴 product id list
+        try: # Cookies 존재시
             cookies = request.headers['Cookie']
-        except:
-            cookies = None
-
-        # Cookies 존재시
-        if cookies:
             cookies = cookies.split(';')
             if DEBUG: print('Cookies List : ', cookies)
-            p_num_list = [int(cookie.strip().replace(COOKIE_KEY_NAME, '').replace('=T','')) for cookie in cookies if COOKIE_KEY_NAME in cookie]
-            if product_id not in p_num_list:
-                detail_product.views = F("views") + 1
-                detail_product.save()
-                detail_product.refresh_from_db() # save 한 DB 재 호출
+            p_id_list = [int(cookie.strip().replace(COOKIE_KEY_NAME, '').replace('=T','')) for cookie in cookies if COOKIE_KEY_NAME in cookie]
+        except: # cookie 없으면
+            p_id_list = []
 
+        # 현재 상품 product_id 방문이력 없으면
+        if product_id not in p_id_list:
+            detail_product.views = F("views") + 1
+            detail_product.save()
+            detail_product.refresh_from_db() # save 한 DB 재 호출
+            
         # Serializers
         detail_product_data = ProductDetailSerializer(detail_product).data
 
         # Response Cookie Settings
         response = Response(detail_product_data, status=status.HTTP_200_OK)
-        response.set_cookie(
-            key = 'visitedproduct'+str(product_id), value='T', max_age = EXPIRED_TIME
-        )
+
+        # 현재 상품 product_id 방문이력 없을 때만
+        if product_id not in p_id_list:
+            response.set_cookie(
+                key = 'visitedproduct'+str(product_id), value='T', max_age = EXPIRED_TIME
+            )
         return response
 
 '''

@@ -33,8 +33,10 @@ else: # MODE = PRODUCTION
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+if MODE == 'PRODUCTION':
+    ALLOWED_HOSTS = ["*"]
+else: # MODE = LOCAL or LOCAL_TEST
+    ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -67,10 +69,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-]
 
 ROOT_URLCONF = 'AuthService.urls'
 
@@ -106,16 +104,30 @@ DATABASES = {
 '''
 
 # PostgreSQL
-DATABASES = {
-    'default': {
-        'ENGINE': os.environ.get("DB_ENGINE"),
-        'NAME': os.environ.get("DB_NAME"), # Schema Name
-        'USER': os.environ.get("DB_USER"),
-        'PASSWORD': os.environ.get("DB_PASSWORD"), # PASSWORD NAME
-        'HOST':os.environ.get("DB_HOST"),
-        'PORT':os.environ.get("DB_PORT"),
+if MODE == 'PRODUCTION':
+    DATABASES = {
+        'default': {
+            'ENGINE': os.environ.get("PRODUCTION_ENGINE"),
+            'NAME': os.environ.get("PRODUCTION_NAME"), # Schema Name
+            'USER': os.environ.get("PRODUCTION_USER"),
+            'PASSWORD': os.environ.get("PRODUCTION_PASSWORD"), # PASSWORD
+            'HOST':os.environ.get("PRODUCTION_HOST"),
+            'PORT':os.environ.get("PRODUCTION_PORT"),
+        }
     }
-}
+# NOT TESTING MODE
+else: # MODE=LOCAL
+    DATABASES = {
+        'default': {
+            'ENGINE': os.environ.get("DB_ENGINE"),
+            'NAME': os.environ.get("DB_NAME"), # Schema Name
+            'USER': os.environ.get("DB_USER"),
+            'PASSWORD': os.environ.get("DB_PASSWORD"), # PASSWORD NAME
+            'HOST':os.environ.get("DB_HOST"),
+            'PORT':os.environ.get("DB_PORT"),
+        }
+    }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -161,9 +173,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # social app custom settings
-AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend',
-                        'allauth.account.auth_backends.AuthenticationBackend'                
-]
+# AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend',
+                        # 'allauth.account.auth_backends.AuthenticationBackend'                
+# ]
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [ # 기본적인 view 접근 권한 지정
