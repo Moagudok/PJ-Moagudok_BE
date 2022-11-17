@@ -1,11 +1,37 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, exceptions
+from rest_framework import status, exceptions, serializers
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import permissions
 from sharedb.models import User as UserModel
-from .serializers import UserSerializer
+from .serializers import UserSerializer, LoginUserSerializer
 
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
+
+
+# user/login
+class LoginUserAPIView(APIView):
+    
+    def post(self, request):
+        serializer = LoginUserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data # Fetch the data form serializer
+
+        user = authenticate(email=data['email'], password=data['password']) # check for email and password
+        if not user or user.is_seller != data['is_seller']: # check for phone
+            raise serializers.ValidationError({'detail':'지정된 자격 증명에 해당하는 활성화된 사용자를 찾을 수 없습니다'})
+
+        # Generate Token
+        refresh = RefreshToken.for_user(user)
+
+        return Response(
+            {
+                'access': str(refresh.access_token),
+                'refresh': str(refresh)
+            }
+            , status=status.HTTP_200_OK
+            )
 
 
 

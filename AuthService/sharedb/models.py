@@ -19,21 +19,23 @@ class SignupMethod(models.Model):
 
 class UserManager(BaseUserManager):
     #일반 유저 생성
-    def create_user(self, email, password=None):
+    def create_user(self, email, is_seller, password=None):
         if not email:
             raise ValueError('must have an email')
         user = self.model(
-            email=email
+            email=email,
+            is_seller=is_seller
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
     
     # 관리자 계정 생성
-    def create_superuser(self, email, password=None):
+    def create_superuser(self, email,is_seller, password=None):
         user = self.create_user(
             email=email,
-            password=password
+            password=password,
+            is_seller=is_seller
         )
         user.is_admin = True
         user.save(using=self._db)
@@ -42,34 +44,20 @@ class UserManager(BaseUserManager):
 # User(소비자/판매자) Table
 class User(AbstractBaseUser):        
     email = models.EmailField("이메일", max_length=150, unique=True, null=False, blank=False)
-    name = models.CharField("이름", max_length=20, null=True)
+    name = models.CharField("이름", max_length=20)
     password = models.CharField("비밀번호", max_length=100)
-    address = models.CharField("주소", max_length=100, null=True)
+    address = models.CharField("주소", max_length=100)
     join_date = models.DateTimeField("가입일", auto_now_add=True)
     signup_method = models.ForeignKey(SignupMethod, verbose_name="가입방법", on_delete=models.SET_NULL, null=True)
     is_active = models.BooleanField(default=True) # 계정활성화 여부
     is_seller = models.BooleanField(default=False) # 판매자 여부
-
     USERNAME_FIELD = 'email' # 로그인 시 사용할 필드 지정
-    REQUIRED_FIELDS = []
-    
+    REQUIRED_FIELDS= ["is_seller"]
+
     objects = UserManager() # custom user 생성 시 필요
 
     class Meta:
         db_table = 'User'
-        
-    def __str__(self):
-        return f"{self.email}입니다."
-
-    def has_perm(self, perm, obj=None):
-        return True
-
-    def has_module_perms(self, app_label):
-        return True
-        
-    @property
-    def is_staff(self):
-        return self.is_admin
 
 # 카테고리
 class Category(models.Model):
