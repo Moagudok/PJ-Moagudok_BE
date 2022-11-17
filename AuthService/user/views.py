@@ -24,10 +24,10 @@ class ConsumerJoinView(APIView):
 class SellerJoinView(APIView):
     
     def post(self, request):
-        request.data['is_seller'] = True
+        
         user_serializer = UserSerializer(data=request.data)
         if user_serializer.is_valid():
-            user_serializer.save()
+            user_serializer.save(is_seller = True)
             return Response({"user" : user_serializer.data, "msg" : "회원가입 완료"}, status=status.HTTP_201_CREATED)
         return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
