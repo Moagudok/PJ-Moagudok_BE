@@ -5,7 +5,7 @@ from rest_framework.exceptions import ErrorDetail
 from django.db import transaction
 from datetime import datetime
 from .db import MongoConnectorbySingleton
-from constants import RECENT_TEXT_COUNT, TOPHITS_TEXT_COUNT
+from constants import RECENT_TEXT_COUNT, TOPHITS_TEXT_COUNT, DEBUG_PRINT
 
 from datetime import datetime, timedelta
 import json
@@ -18,7 +18,6 @@ class SearchLatestTextListView(APIView):
         search_text = self.request.data['search']
 
         db_obj = MongoConnectorbySingleton()
-        print('======', db_obj)
         db_col = db_obj.collection
         
         is_searched = db_col.find_one({'searchText':search_text})
@@ -42,10 +41,8 @@ class SearchLatestTextListView(APIView):
 # url : /search/tophits
 class SearchTopHitTextListView(APIView):
     def get(self, request):
-        DEBUG = True
         db_obj = MongoConnectorbySingleton()
         db_col = db_obj.collection
-        print('======', db_obj)
  
         pipeline = [
             { # 조건
@@ -63,13 +60,7 @@ class SearchTopHitTextListView(APIView):
         ]
 
         # aggreagte의 제약 가능한 메모리 조작은 100MB로, 초과시 allowDiskUse=True 지정 필요
-        tophits_search_text = list(db_col.aggregate(pipeline)) 
-        if DEBUG: print('tophits_search_text', tophits_search_text)
+        tophits_search_text = list(db_col.aggregate(pipeline))[:TOPHITS_TEXT_COUNT] # 10개
+        if DEBUG_PRINT: print('tophits_search_text', tophits_search_text)
         results =  json.dumps(tophits_search_text, default=json_util.default)
         return Response(results, status=status.HTTP_200_OK)
-
-#         # db_col.insert_many([
-#         #     {'username' : 1,'searchText': 'abcd','datetime': datetime.now()},
-#         #     {'username' : 1,'searchText': 'abcd'+'2','datetime': datetime.now()},
-#         #     {'username' : 1,'searchText': 'abdc'+'3','datetime': datetime.now()},
-#         # ])

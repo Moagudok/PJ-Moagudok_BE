@@ -8,7 +8,7 @@ from django.db import transaction
 from django.db.models import Q, F
 from sharedb.models import Category, Product
 from .serializers import CategoryListSerializer, ProductListSerializer, ProductDetailSerializer
-from constants import COOKIE_KEY_NAME, EXPIRED_TIME, STANDARD_NUM_OF_PRODUCTS, PER_PAGE_SIZE
+from constants import COOKIE_KEY_NAME, EXPIRED_TIME, STANDARD_NUM_OF_PRODUCTS, PER_PAGE_SIZE, DEBUG_PRINT
 
 # url : /consumer/product/category
 class ProductCategoryListView(APIView):
@@ -43,8 +43,6 @@ class ProductListPaginationViewSet(viewsets.ModelViewSet):
 class ProductDetailView(APIView):
     @transaction.atomic
     def get(self, request, product_id):
-        DEBUG = True # 쿠키값, json 값 확인을 위한 parameter
-
         try:
             detail_product = Product.objects.get(id = product_id)
         except:
@@ -54,7 +52,7 @@ class ProductDetailView(APIView):
         try: # Cookies 존재시
             cookies = request.headers['Cookie']
             cookies = cookies.split(';')
-            if DEBUG: print('Cookies List : ', cookies)
+            if DEBUG_PRINT: print('Cookies List : ', cookies)
             p_id_list = [int(cookie.strip().replace(COOKIE_KEY_NAME, '').replace('=T','')) for cookie in cookies if COOKIE_KEY_NAME in cookie]
         except: # cookie 없으면
             p_id_list = []
