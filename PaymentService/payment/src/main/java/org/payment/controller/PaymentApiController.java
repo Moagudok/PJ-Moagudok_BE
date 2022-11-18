@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import net.bytebuddy.asm.Advice;
@@ -65,12 +66,19 @@ public class PaymentApiController {
             }
             // 소비자의 만료된 구독상품들
             case "exp": {
-                List<Payment> resultList = paymentService.exp_product(consumerId, LocalDate.now());
+                List<Payment> expList = paymentService.exp_product(consumerId, LocalDate.now());
                 List<Long> productList = new ArrayList<>();
-                for (Payment payment : resultList) {
+                for (Payment payment : expList) {
                     productList.add(payment.getProductId());
                 }
-                return productList;
+                // 증복제거
+                List<Long> resultList = productList.stream().distinct().collect(Collectors.toList());
+                // 현재 구독중인 상품 리스트 제거
+                List<Payment> subList = paymentService.sub_product(consumerId, LocalDate.now());
+                for (Payment payment : subList){
+                    resultList.remove(payment.getProductId());
+                }
+                return resultList;
             }
             // 소비자의 상품중 만료가 7일 전인 상품들
             case "7ago": {
