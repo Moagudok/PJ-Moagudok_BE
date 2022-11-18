@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -40,21 +41,21 @@ public class PaymentService {
         return paymentRepository.findBySellerId(sellerId);
     }
     @Transactional
-    public List<Payment> findByConsumerIdAndExpirationDateGreaterThan(Long consumerId, LocalDate localDate){
+    public List<Payment> sub_product(Long consumerId, LocalDate localDate){
         return paymentRepository.findByConsumerIdAndExpirationDateGreaterThan(consumerId, localDate);
     }
     @Transactional
-    public List<Payment> findByConsumerIdAndExpirationDateIs(Long consumerId, LocalDate localDate){
+    public List<Payment> exp_today(Long consumerId, LocalDate localDate){
         return paymentRepository.findByConsumerIdAndExpirationDateIs(consumerId, localDate);
     }
     @Transactional
-    public List<Payment> findByConsumerIdAndExpirationDateLessThan(Long consumerId, LocalDate localDate){
+    public List<Payment> exp_product(Long consumerId, LocalDate localDate){
         return paymentRepository.findByConsumerIdAndExpirationDateLessThan(consumerId, localDate);
     }
-
-
-
-
+    @Transactional
+    public List<Payment> exp_7ago(Long consumerId, LocalDate now, LocalDate ago){
+        return paymentRepository.findByConsumerIdAndExpirationDateBetween(consumerId, now, ago);
+    }
 
 
 }
