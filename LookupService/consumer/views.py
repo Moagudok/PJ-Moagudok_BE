@@ -8,6 +8,7 @@ from django.db import transaction
 from django.db.models import Q, F
 from sharedb.models import Category, Product
 from .serializers import CategoryListSerializer, ProductListSerializer, ProductDetailSerializer
+from constants import COOKIE_KEY_NAME, EXPIRED_TIME, STANDARD_NUM_OF_PRODUCTS, PER_PAGE_SIZE
 
 # url : /consumer/product/category
 class ProductCategoryListView(APIView):
@@ -17,7 +18,7 @@ class ProductCategoryListView(APIView):
         return Response(CategorySerializer_data, status.HTTP_200_OK)
 
 class ProductListPaginationClass(PageNumberPagination): # 
-    page_size = 10 # settings.py의 Default 값 변경
+    page_size = PER_PAGE_SIZE # settings.py의 Default 값 변경
 
 # url : /consumer/product/list?category=1&search&page=1
 class ProductListPaginationViewSet(viewsets.ModelViewSet):
@@ -44,32 +45,37 @@ class ProductDetailView(APIView):
     def get(self, request, product_id):
         DEBUG = True # 쿠키값, json 값 확인을 위한 parameter
 
-        COOKIE_KEY_NAME = 'visitedproduct'
-        EXPIRED_TIME = 5
-        cookies = request.headers['Cookie'].split(';')
-
-        if DEBUG: print(cookies)
-        p_num_list = [int(cookie.strip().replace(COOKIE_KEY_NAME, '').replace('=T','')) for cookie in cookies if COOKIE_KEY_NAME in cookie]
-        
         try:
-            # GET product
             detail_product = Product.objects.get(id = product_id)
-
-            # 방문이력 x
-            if product_id not in p_num_list:
-                detail_product.views = F("views") + 1
-                detail_product.save()
-                detail_product.refresh_from_db()
         except:
             return Response(ErrorDetail(string = '존재하지 않는 구독 상품 입니다.', code=404), status=status.HTTP_404_NOT_FOUND)
 
+        # Cookies에 담긴 product id list
+        try: # Cookies 존재시
+            cookies = request.headers['Cookie']
+            cookies = cookies.split(';')
+            if DEBUG: print('Cookies List : ', cookies)
+            p_id_list = [int(cookie.strip().replace(COOKIE_KEY_NAME, '').replace('=T','')) for cookie in cookies if COOKIE_KEY_NAME in cookie]
+        except: # cookie 없으면
+            p_id_list = []
+
+        # 현재 상품 product_id 방문이력 없으면
+        if product_id not in p_id_list:
+            detail_product.views = F("views") + 1
+            detail_product.save()
+            detail_product.refresh_from_db() # save 한 DB 재 호출
+            
+        # Serializers
         detail_product_data = ProductDetailSerializer(detail_product).data
 
         # Response Cookie Settings
         response = Response(detail_product_data, status=status.HTTP_200_OK)
-        response.set_cookie(
-            key = 'visitedproduct'+str(product_id), value='T', max_age = EXPIRED_TIME
-        )
+
+        # 현재 상품 product_id 방문이력 없을 때만
+        if product_id not in p_id_list:
+            response.set_cookie(
+                key = 'visitedproduct'+str(product_id), value='T', max_age = EXPIRED_TIME
+            )
         return response
 
 '''
@@ -84,7 +90,7 @@ class HomeView(APIView):
         popular_products = Product.objects.all().order_by('-num_of_subscribers')
         new_products = Product.objects.all().order_by('-update_date')
 
-        STANDARD_NUM_OF_PRODUCTS = 10
+        
         PRODUCT_NUM = min(Product.objects.count(), STANDARD_NUM_OF_PRODUCTS) # 현재 Product 갯수가 NUM_OF_PRODUCTS (10) 보다 적을 때
         popular_products = popular_products[:PRODUCT_NUM] # 내림차순 구독자 수
         new_products = new_products[:PRODUCT_NUM] # 내림차순 update 기준 (-id도 가능)
