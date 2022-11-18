@@ -21,3 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
         
 
+class LoginUserSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    is_seller = serializers.BooleanField()
+    password = serializers.CharField(write_only=True)
