@@ -10,4 +10,10 @@ PER_PAGE_SIZE = 10
 
 # 검색 관련
 RECENT_TEXT_COUNT = 10 # 최근 검색어 갯수
-TOPHITS_TEXT_COUNT = 15 # 가장 많이 검색한 갯수
+TOPHITS_TEXT_COUNT = 10 # 가장 많이 검색한 갯수
+
+# 디버깅 관련
+DEBUG_PRINT = True
+
+# 상품 Detail 정보
+OTHER_PRODUCTS_NUM_IN_SELLER = 5
