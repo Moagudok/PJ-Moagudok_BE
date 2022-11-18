@@ -14,3 +14,6 @@ TOPHITS_TEXT_COUNT = 10 # 가장 많이 검색한 갯수
 
 # 디버깅 관련
 DEBUG_PRINT = True
+
+# 상품 Detail 정보
+OTHER_PRODUCTS_NUM_IN_SELLER = 5

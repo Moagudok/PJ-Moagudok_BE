@@ -8,7 +8,9 @@ from django.db import transaction
 from django.db.models import Q, F
 from sharedb.models import Category, Product
 from .serializers import CategoryListSerializer, ProductListSerializer, ProductDetailSerializer
-from constants import COOKIE_KEY_NAME, EXPIRED_TIME, STANDARD_NUM_OF_PRODUCTS, PER_PAGE_SIZE, DEBUG_PRINT
+from constants import COOKIE_KEY_NAME, EXPIRED_TIME, STANDARD_NUM_OF_PRODUCTS, PER_PAGE_SIZE, DEBUG_PRINT, OTHER_PRODUCTS_NUM_IN_SELLER
+
+import random
 
 # url : /consumer/product/category
 class ProductCategoryListView(APIView):
@@ -43,6 +45,7 @@ class ProductListPaginationViewSet(viewsets.ModelViewSet):
 class ProductDetailView(APIView):
     @transaction.atomic
     def get(self, request, product_id):
+        # GET Product by product_id
         try:
             detail_product = Product.objects.get(id = product_id)
         except:
@@ -50,11 +53,11 @@ class ProductDetailView(APIView):
 
         # Cookies에 담긴 product id list
         try: # Cookies 존재시
-            cookies = request.headers['Cookie']
-            cookies = cookies.split(';')
+            cookies = request.headers['Cookie'].split(';')
             if DEBUG_PRINT: print('Cookies List : ', cookies)
+            # visitedproduct2=T; visitedproduct4=T ==> [2, 4]
             p_id_list = [int(cookie.strip().replace(COOKIE_KEY_NAME, '').replace('=T','')) for cookie in cookies if COOKIE_KEY_NAME in cookie]
-        except: # cookie 없으면
+        except: # cookie 없으면 (첫방문)
             p_id_list = []
 
         # 현재 상품 product_id 방문이력 없으면
@@ -63,11 +66,23 @@ class ProductDetailView(APIView):
             detail_product.save()
             detail_product.refresh_from_db() # save 한 DB 재 호출
             
+        # 해당 판매자의 다른 상품들 (not detail_product.id, seller_id)
+        condition = Q()
+        condition.add(Q(seller=1), condition.AND)
+        condition.add(~Q(id=product_id), condition.AND)
+        other_prducts = list(Product.objects.filter(condition))
+        random.shuffle(other_prducts)
+        other_prducts = other_prducts[:OTHER_PRODUCTS_NUM_IN_SELLER]
+
         # Serializers
         detail_product_data = ProductDetailSerializer(detail_product).data
+        other_products_data = ProductListSerializer(other_prducts, many=True).data
 
         # Response Cookie Settings
-        response = Response(detail_product_data, status=status.HTTP_200_OK)
+        response = Response(
+            {'detail_product_data': detail_product_data, 'other_products_data': other_products_data}, 
+            status=status.HTTP_200_OK
+        )
 
         # 현재 상품 product_id 방문이력 없을 때만
         if product_id not in p_id_list:
