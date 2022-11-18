@@ -33,10 +33,8 @@ class LoginUserAPIView(APIView):
             , status=status.HTTP_200_OK
             )
 
-
-
-# user/cjoin
-class ConsumerJoinView(APIView):
+# user/join
+class JoinUserAPIView(APIView):
     permission_classes = [permissions.AllowAny]
     
     def post(self, request):
@@ -45,18 +43,6 @@ class ConsumerJoinView(APIView):
             user_serializer.save()
             return Response({"user" : user_serializer.data, "msg" : "회원가입 완료"}, status=status.HTTP_201_CREATED)
         return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# user/sjoin
-class SellerJoinView(APIView):
-    
-    def post(self, request):
-        request.data['is_seller'] = True
-        user_serializer = UserSerializer(data=request.data)
-        if user_serializer.is_valid():
-            user_serializer.save()
-            return Response({"user" : user_serializer.data, "msg" : "회원가입 완료"}, status=status.HTTP_201_CREATED)
-        return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 # user
 class UserAPIView(APIView):

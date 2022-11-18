@@ -51,6 +51,7 @@ class User(AbstractBaseUser):
     signup_method = models.ForeignKey(SignupMethod, verbose_name="가입방법", on_delete=models.SET_NULL, null=True)
     is_active = models.BooleanField(default=True) # 계정활성화 여부
     is_seller = models.BooleanField(default=False) # 판매자 여부
+    is_admin = models.BooleanField(default=False) # 판매자 여부
     USERNAME_FIELD = 'email' # 로그인 시 사용할 필드 지정
     REQUIRED_FIELDS= ["is_seller"]
 
