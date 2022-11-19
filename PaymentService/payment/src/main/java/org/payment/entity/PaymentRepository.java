@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
     List<Payment> findByConsumerId(Long consumerId);
     List<Payment> findBySellerId(Long sellerId);
-    List<Payment> findByConsumerIdAndExpirationDateGreaterThan(Long consumerId, LocalDate localDate);
+    List<Payment> findByConsumerIdAndExpirationDateGreaterThanEqual(Long consumerId, LocalDate localDate);
     List<Payment> findByConsumerIdAndExpirationDateIs(Long consumerId, LocalDate localDate);
     List<Payment> findByConsumerIdAndExpirationDateLessThan(Long consumerId, LocalDate localDate);
     List<Payment> findByConsumerIdAndExpirationDateBetween(Long consumerId, LocalDate now, LocalDate ago);

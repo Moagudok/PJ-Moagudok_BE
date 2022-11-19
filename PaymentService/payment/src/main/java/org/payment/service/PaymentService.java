@@ -33,7 +33,7 @@ public class PaymentService {
     }
     @Transactional
     public List<Payment> sub_product(Long consumerId, LocalDate localDate){
-        return paymentRepository.findByConsumerIdAndExpirationDateGreaterThan(consumerId, localDate);
+        return paymentRepository.findByConsumerIdAndExpirationDateGreaterThanEqual(consumerId, localDate);
     }
     @Transactional
     public List<Payment> exp_today(Long consumerId, LocalDate localDate){
