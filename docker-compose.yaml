@@ -1,6 +1,12 @@
 version: "3.8"
 
 services:
+  redis:
+    image: redis:5
+    command: redis-server --port 6379
+    ports:
+      - 6379:6379
+      
   nginx:
     build: ./_nginx
     ports:

@@ -6,18 +6,37 @@ from rest_framework.exceptions import ErrorDetail
 
 from django.db import transaction
 from django.db.models import Q, F
+from django.core.cache import cache
+
 from sharedb.models import Category, Product
 from .serializers import CategoryListSerializer, ProductListSerializer, ProductDetailSerializer
-from constants import COOKIE_KEY_NAME, EXPIRED_TIME, STANDARD_NUM_OF_PRODUCTS, PER_PAGE_SIZE, DEBUG_PRINT, OTHER_PRODUCTS_NUM_IN_SELLER
+from constants import COOKIE_KEY_NAME, EXPIRED_TIME, \
+        STANDARD_NUM_OF_PRODUCTS, PER_PAGE_SIZE, \
+        DEBUG_PRINT, OTHER_PRODUCTS_NUM_IN_SELLER, CACHE_KEY
 
 import random
+import json
 
-# url : /consumer/product/category
+''' Before Caching Code
 class ProductCategoryListView(APIView):
     def get(self, request):
         category_data = Category.objects.all()
         CategorySerializer_data = CategoryListSerializer(category_data, many=True).data
         return Response(CategorySerializer_data, status.HTTP_200_OK)
+'''
+
+# After Caching Code
+# url : /consumer/product/category
+class ProductCategoryListView(APIView):
+    def get(self, request):
+        cache_value = cache.get(CACHE_KEY, None)
+        if cache_value == None:
+            category_data = Category.objects.all()
+            CategorySerializer_data = CategoryListSerializer(category_data, many=True).data
+            CategorySerializer_json_data = json.dumps(CategorySerializer_data)
+            cache.set(CACHE_KEY, CategorySerializer_json_data) # key, value, expriation time
+            cache_value = CategorySerializer_json_data
+        return Response(cache_value, status.HTTP_200_OK)
 
 class ProductListPaginationClass(PageNumberPagination): # 
     page_size = PER_PAGE_SIZE # settings.py의 Default 값 변경
