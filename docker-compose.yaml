@@ -67,4 +67,4 @@ services:
       - SPRING.JPA.PROPERTIES.HIBERNATE.FORMAT_SQL=true
       - SPRING.JPA.DATABASE-PLATFORM=org.hibernate.dialect.PostgreSQLDialect
       - SPRING.JPA.GENERATE-DDL=true
-    
+      - SPRING.JPA.HIBERNATE.DDL-AUTO=validate    

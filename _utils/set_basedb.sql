@@ -54,6 +54,14 @@ INSERT INTO public."Product"(
         	'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_processed_food_tuna.jpg','참치 통조림 다양하게 먹고 싶은 사람만~',
 			22, 5);
 
+
+INSERT INTO public."User"(email, password, name, address, is_seller, signup_method_id, join_date, is_active, is_admin)
+ VALUES 
+ ('consumer1@mail.com', 1234, '구매자1', '구매자의주소', false, 1, '2022-11-19', true, false),
+ ('seller1@mail.com', 1234, '판매자1', '판매자의주소', true, 1, '2022-11-19', true, false);
+
+
+# TEST 용 임의 Product 데이터
 INSERT INTO public."ProductImages"(id, image, product_id)
 	VALUES
 	(1, 'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_crawling_news_politics_detail1.jpg', 2),
