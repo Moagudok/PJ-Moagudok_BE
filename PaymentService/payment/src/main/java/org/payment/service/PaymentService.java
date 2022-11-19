@@ -16,8 +16,8 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public Long save(PaymentRequestDTO params) {
-        return paymentRepository.save(params.toEntity()).getId();
+    public Payment save(Payment payment) {
+        return paymentRepository.save(payment);
     }
     @Transactional
     public List<Payment> findAll() {
