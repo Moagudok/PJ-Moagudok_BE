@@ -8,9 +8,14 @@ from django.db import transaction
 from django.db.models import Q, F
 from sharedb.models import Category, Product
 from .serializers import CategoryListSerializer, ProductListSerializer, ProductDetailSerializer
-from constants import COOKIE_KEY_NAME, EXPIRED_TIME, STANDARD_NUM_OF_PRODUCTS, PER_PAGE_SIZE, DEBUG_PRINT, OTHER_PRODUCTS_NUM_IN_SELLER
+from constants import COOKIE_KEY_NAME, EXPIRED_TIME, \
+    STANDARD_NUM_OF_PRODUCTS, PER_PAGE_SIZE, \
+    DEBUG_PRINT, OTHER_PRODUCTS_NUM_IN_SELLER, \
+    AWS_IP
 
 import random
+import requests
+import json
 
 # url : /consumer/product/category
 class ProductCategoryListView(APIView):
@@ -116,3 +121,31 @@ class HomeView(APIView):
                 'popular_products':popular_products_data, 
                 'new_products':new_products_data,
             }, status=status.HTTP_200_OK)
+
+''' 마이페이지
+(1) 구독 중 { consumerId : request.user, type : sub }
+(2) 구독 만료 7일 전 - { consumerId : request.user, type : 7ago }
+(3) 구독 종료 당일 - { consumerId : request.user, type : now }
+(4) 구독 만료 상품 - { consumerId : request.user, type : exp }
+
+'''
+# url : /consumer/mypage/
+class MypageView(APIView):
+    def get(self, request):
+        # request.user.id = 1
+        type_value = request.query_params['type']
+        try:
+            response = requests.get('http://' + AWS_IP + '/payment/consumer/mypage?'\
+                +'consumerId='+str(1)+'&'\
+                +'type='+type_value)
+            if response.status_code == status.HTTP_404_NOT_FOUND:
+                return Response({'detail':'params is invalid'}, response=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response({'detail':'Payment Service is not working'}, response=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # Convert Json     
+        product_id_json = json.loads(response.text)
+        mypage_products = Product.objects.filter(id__in = product_id_json).order_by('-update_date')
+        mypage_products_data = ProductListSerializer(mypage_products, many=True).data
+        return Response(mypage_products_data, status=status.HTTP_200_OK)
+

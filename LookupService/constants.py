@@ -1,3 +1,6 @@
+from django.conf import settings
+import os
+
 # Cookie Constant
 COOKIE_KEY_NAME = 'visitedproduct'
 EXPIRED_TIME = 7 
@@ -17,3 +20,6 @@ DEBUG_PRINT = True
 
 # 상품 Detail 정보
 OTHER_PRODUCTS_NUM_IN_SELLER = 5
+
+# IP
+AWS_IP = os.environ.get('AWS_HOST') + ':' + os.environ.get('AWS_PAYMENT_SVC_PORT')
