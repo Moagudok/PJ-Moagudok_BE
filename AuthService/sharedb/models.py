@@ -81,6 +81,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null = True)
     product_group_name = models.CharField("상품 그룹명", max_length=30)
     product_name = models.CharField("상품명", max_length=30)
+    subtitle = models.CharField("상품간단설명", max_length=50)
     payment_term = models.ForeignKey(PaymentTerm, verbose_name = "구독 기간 단위", on_delete=models.SET_NULL, null=True) 
     register_date = models.DateField("상품 최초 등록일", auto_now_add=True) 
     update_date = models.DateField("상품 수정일", auto_now=True)
