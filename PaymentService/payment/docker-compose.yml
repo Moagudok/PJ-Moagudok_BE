@@ -22,7 +22,7 @@ services:
     environment:
       - SPRING_DATASOURCE_DIVER-CLASS-NAME=org.postgresql.Driver
       - SPRING_DATASOURCE_PLATFORM=postgres
-      - SPRING.JPA.HIBERNATE.DDL-AUTO=update
+      - SPRING.JPA.HIBERNATE.DDL-AUTO=validate
       - SPRING.JPA.SHOW.SQL=true
       - SPRING.JPA.DATABASE=postgresql
       - SPRING.JPA.PROPERTIES.HIBERNATE.FORMAT_SQL=true

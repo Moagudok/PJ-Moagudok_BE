@@ -20,7 +20,7 @@ public class PaymentApiController {
 
     // 결제 내역 생성
     @PostMapping
-    public ResponseEntity<Long> save(@RequestBody final PaymentRequestDTO params) {
+    public ResponseEntity<Payment> save(@RequestBody Payment params) {
         return ResponseEntity.ok(paymentService.save(params));
     }
     // 전체 결제 내역 조회
@@ -34,7 +34,7 @@ public class PaymentApiController {
         return ResponseEntity.ok(paymentService.findByConsumerId(consumerId));
     }
     // 판매자 결제 내역 조회
-    @GetMapping("/seller/")
+    @GetMapping("/seller")
     public ResponseEntity<List<Payment>> findBySellerId(@RequestParam Long sellerId){
         return ResponseEntity.ok(paymentService.findBySellerId(sellerId));
     }
