@@ -1,23 +1,14 @@
 package org.payment.service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import org.payment.DTO.PaymentRequestDTO;
-import org.payment.DTO.PaymentResponseDTO;
 import org.payment.entity.Payment;
 import org.payment.entity.PaymentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +16,8 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public Long save(PaymentRequestDTO params) {
-        return paymentRepository.save(params.toEntity()).getId();
+    public Payment save(Payment payment) {
+        return paymentRepository.save(payment);
     }
     @Transactional
     public List<Payment> findAll() {

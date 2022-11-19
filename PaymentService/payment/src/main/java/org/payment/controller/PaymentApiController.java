@@ -2,20 +2,15 @@ package org.payment.controller;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
-import net.bytebuddy.asm.Advice;
 import org.payment.DTO.PaymentRequestDTO;
-import org.payment.DTO.PaymentResponseDTO;
 import org.payment.entity.Payment;
 import org.payment.service.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping({"/payment"})
@@ -25,7 +20,7 @@ public class PaymentApiController {
 
     // 결제 내역 생성
     @PostMapping
-    public ResponseEntity<Long> save(@RequestBody final PaymentRequestDTO params) {
+    public ResponseEntity<Payment> save(@RequestBody Payment params) {
         return ResponseEntity.ok(paymentService.save(params));
     }
     // 전체 결제 내역 조회
@@ -39,10 +34,11 @@ public class PaymentApiController {
         return ResponseEntity.ok(paymentService.findByConsumerId(consumerId));
     }
     // 판매자 결제 내역 조회
-    @GetMapping("/seller/")
+    @GetMapping("/seller")
     public ResponseEntity<List<Payment>> findBySellerId(@RequestParam Long sellerId){
         return ResponseEntity.ok(paymentService.findBySellerId(sellerId));
     }
+    // 마이페이지 조회용
     @GetMapping("/consumer/mypage")
     public List<Long> sub_product(@RequestParam Long consumerId, String type){
         switch (type) {
