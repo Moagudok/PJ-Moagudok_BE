@@ -21,5 +21,8 @@ DEBUG_PRINT = True
 # 상품 Detail 정보
 OTHER_PRODUCTS_NUM_IN_SELLER = 5
 
+# CACHING 기능 활용
+CACHE_KEY = 'CATEGORY_LIST'
+
 # IP
 AWS_IP = os.environ.get('AWS_HOST') + ':' + os.environ.get('AWS_PAYMENT_SVC_PORT')

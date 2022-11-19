@@ -13,7 +13,7 @@ public class PaymentResponseDTO {
     private Integer price;
     private LocalDate subscriptionDate;
     private LocalDate expirationDate;
-    private String paymentDue;
+    private LocalDate paymentDueDate;
     private Long consumerId;
     private Long sellerId;
 
@@ -23,7 +23,7 @@ public class PaymentResponseDTO {
         this.price = entity.getPrice();
         this.subscriptionDate = entity.getSubscriptionDate();
         this.expirationDate = entity.getExpirationDate();
-        this.paymentDue = entity.getPaymentDue();
+        this.paymentDueDate = entity.getPaymentDueDate();
         this.consumerId = entity.getConsumerId();
         this.sellerId = entity.getSellerId();
     }

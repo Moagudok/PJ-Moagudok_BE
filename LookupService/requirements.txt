@@ -7,4 +7,5 @@ django-dotenv
 pytest-django
 pytest
 pymongo
+django-redis
 # psycopg2-binary : EC2-Linux
