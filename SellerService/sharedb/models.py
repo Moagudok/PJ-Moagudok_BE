@@ -110,4 +110,4 @@ class Payment(models.Model):
     payment_due_date = models.DateField("결제예정일", auto_now=True)
     
     class Meta:
-        db_table = 'Payment'
+        db_table = 'payment'

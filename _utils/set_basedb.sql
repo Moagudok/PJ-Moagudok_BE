@@ -76,7 +76,7 @@ DELETE FROM public."ProductImages";
 DELETE FROM public."Product";
 
 
-INSERT INTO public."Payment"(id, consumer_id, seller_id, product_id, price, subscription_date, expiration_date, payment_due_date)
+INSERT INTO public."payment"(id, consumer_id, seller_id, product_id, price, subscription_date, expiration_date, payment_due_date)
 	VALUES
 	(1, 1, 1, 1, 10000, '2022-10-29', '2022-11-04', '2022-11-05'),
 	(2, 1, 1, 1, 10000, '2022-11-06', '2022-11-12', '2022-11-13'), 
