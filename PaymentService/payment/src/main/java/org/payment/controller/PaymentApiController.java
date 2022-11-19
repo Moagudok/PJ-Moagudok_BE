@@ -78,7 +78,7 @@ public class PaymentApiController {
             }
             // 소비자의 상품중 만료가 7일 전인 상품들
             case "7ago": {
-                List<Payment> resultList = paymentService.exp_7ago(consumerId, LocalDate.now().plusDays(1), LocalDate.now().plusWeeks(1));
+                List<Payment> resultList = paymentService.exp_7ago(consumerId, LocalDate.now(), LocalDate.now().plusWeeks(1));
                 List<Long> productList = new ArrayList<>();
                 for (Payment payment : resultList) {
                     productList.add(payment.getProductId());
