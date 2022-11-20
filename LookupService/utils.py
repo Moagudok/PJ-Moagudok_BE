@@ -10,7 +10,7 @@ def get_userinfo(request):
     mode = getattr(settings, 'MODE', 'PRODUCTION')  
     print('====mode:', mode)
     if mode == 'PRODUCTION':
-        url = 'http://' + AWS_IP + ':8000/user'
+        url = 'http://' + AWS_IP + '/user'
     else:
         url = 'http://127.0.0.1:8000/user'
 
