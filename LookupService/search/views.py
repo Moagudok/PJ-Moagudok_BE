@@ -1,10 +1,10 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.exceptions import ErrorDetail
 from django.db import transaction
 from datetime import datetime
 from .db import MongoConnectorbySingleton
+from utils import get_userinfo
 from constants import RECENT_TEXT_COUNT, TOPHITS_TEXT_COUNT, DEBUG_PRINT
 
 from datetime import datetime, timedelta
@@ -22,8 +22,9 @@ class SearchLatestTextListView(APIView):
         
         is_searched = db_col.find_one({'searchText':search_text})
         if is_searched == None:
+            user_id = get_userinfo(request)
             db_col.insert_one(
-                {'user_id' : 2,'searchText': search_text,'dt': datetime.now()},
+                {'user_id' : user_id,'searchText': search_text,'dt': datetime.now()},
             )
         else:
             db_col.update_one({'_id':is_searched['_id']}, {'$set':{'dt':datetime.now()}})
@@ -32,9 +33,8 @@ class SearchLatestTextListView(APIView):
     def get(self, request):
         db_obj = MongoConnectorbySingleton()
         db_col = db_obj.collection
-        recent_searchs = list(db_col.find( {'user_id':1}, {'_id':False} ).limit(RECENT_TEXT_COUNT).sort('dt', -1)) # 
-
-
+        user_id = get_userinfo(request)
+        recent_searchs = list(db_col.find( {'user_id': user_id }, {'_id':False} ).limit(RECENT_TEXT_COUNT).sort('dt', -1)) # 
         results =  json.dumps(recent_searchs, default=json_util.default)
         return Response(results, status=status.HTTP_200_OK)
 
@@ -55,7 +55,7 @@ class SearchTopHitTextListView(APIView):
                 }
             },
             { # 정렬
-                '$sort': {'count' : -1}
+                '$sort': {'count' : -1} # 내림차순
             }
         ]
 
