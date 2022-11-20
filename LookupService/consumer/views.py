@@ -14,6 +14,7 @@ from constants import COOKIE_KEY_NAME, EXPIRED_TIME, \
     STANDARD_NUM_OF_PRODUCTS, PER_PAGE_SIZE, \
     DEBUG_PRINT, OTHER_PRODUCTS_NUM_IN_SELLER, \
     AWS_IP, CACHE_KEY
+from utils import get_userinfo
 
 import random
 import requests
@@ -89,7 +90,7 @@ class ProductDetailView(APIView):
             
         # 해당 판매자의 다른 상품들 (not detail_product.id, seller_id)
         condition = Q()
-        condition.add(Q(seller=1), condition.AND)
+        condition.add(Q(seller=detail_product.seller), condition.AND)
         condition.add(~Q(id=product_id), condition.AND)
         other_prducts = list(Product.objects.filter(condition))
         random.shuffle(other_prducts)
@@ -123,7 +124,6 @@ class HomeView(APIView):
         categories = Category.objects.all()
         popular_products = Product.objects.all().order_by('-num_of_subscribers')
         new_products = Product.objects.all().order_by('-update_date')
-
         
         PRODUCT_NUM = min(Product.objects.count(), STANDARD_NUM_OF_PRODUCTS) # 현재 Product 갯수가 NUM_OF_PRODUCTS (10) 보다 적을 때
         popular_products = popular_products[:PRODUCT_NUM] # 내림차순 구독자 수
@@ -143,19 +143,22 @@ class HomeView(APIView):
 (2) 구독 만료 7일 전 - { consumerId : request.user, type : 7ago }
 (3) 구독 종료 당일 - { consumerId : request.user, type : now }
 (4) 구독 만료 상품 - { consumerId : request.user, type : exp }
-
 '''
 # url : /consumer/mypage/
 class MypageView(APIView):
     def get(self, request):
-        # request.user.id = 1
         type_value = request.query_params['type']
+
+        # GET user_id
+        user_id = get_userinfo(request)
+
+        # TO Payment Service
         try:
             response = requests.get('http://' + AWS_IP + '/payment/consumer/mypage?'\
-                +'consumerId='+str(1)+'&'\
+                +'consumerId='+str(user_id)+'&'\
                 +'type='+type_value)
             if response.status_code == status.HTTP_404_NOT_FOUND:
-                return Response(ErrorDetail(string='Params is invalid', code=404),statuHTTP_404_NOT_FOUND=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(ErrorDetail(string='URL Params is invalid', code=404),statuHTTP_404_NOT_FOUND=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except:
             return Response(ErrorDetail(string='Payment Service is not working', code=500),status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
