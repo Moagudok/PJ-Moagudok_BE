@@ -13,7 +13,7 @@ from .serializers import CategoryListSerializer, ProductListSerializer, ProductD
 from constants import COOKIE_KEY_NAME, EXPIRED_TIME, \
     STANDARD_NUM_OF_PRODUCTS, PER_PAGE_SIZE, \
     DEBUG_PRINT, OTHER_PRODUCTS_NUM_IN_SELLER, \
-    AWS_IP, CACHE_KEY
+    AWS_PAYMENT_IP, CACHE_KEY
 from utils import get_userinfo
 
 import random
@@ -154,7 +154,7 @@ class MypageView(APIView):
 
         # TO Payment Service
         try:
-            response = requests.get('http://' + AWS_IP + '/payment/consumer/mypage?'\
+            response = requests.get('http://' + AWS_PAYMENT_IP + '/payment/consumer/mypage?'\
                 +'consumerId='+str(user_id)+'&'\
                 +'type='+type_value)
             if response.status_code == status.HTTP_404_NOT_FOUND:
