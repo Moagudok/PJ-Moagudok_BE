@@ -155,9 +155,9 @@ class MypageView(APIView):
                 +'consumerId='+str(1)+'&'\
                 +'type='+type_value)
             if response.status_code == status.HTTP_404_NOT_FOUND:
-                return Response({'detail':'params is invalid'}, response=status.HTTP_404_NOT_FOUND)
+                return Response(ErrorDetail(string='Params is invalid', code=404),statuHTTP_404_NOT_FOUND=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except:
-            return Response({'detail':'Payment Service is not working'}, response=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(ErrorDetail(string='Payment Service is not working', code=500),status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # Convert Json     
         product_id_json = json.loads(response.text)
@@ -165,3 +165,23 @@ class MypageView(APIView):
         mypage_products_data = ProductListSerializer(mypage_products, many=True).data
         return Response(mypage_products_data, status=status.HTTP_200_OK)
 
+# url : /consumer/product/subscriber   - body : {product_id : 2}
+class ManageSubscriber(APIView):
+    @transaction.atomic
+    def put(self, request):
+        # GET 
+        product_id = request.data['product_id']
+
+        # GET Product by product_id
+        try:
+            detail_product = Product.objects.get(id = product_id)
+        except:
+            return Response(ErrorDetail(string = '존재하지 않는 구독 상품 입니다.', code=404), status=status.HTTP_404_NOT_FOUND)
+
+        # subscribers 증가
+        try:
+            detail_product.num_of_subscribers = F("num_of_subscribers") + 1
+            detail_product.save()
+            return Response({'detail':'구독자 수 반영 완료'},status=status.HTTP_200_OK)
+        except:
+            return Response(ErrorDetail(string='내부 오류로 구독자 수 반영 실패', code=500),status=status.HTTP_500_INTERNAL_SERVER_ERROR)
