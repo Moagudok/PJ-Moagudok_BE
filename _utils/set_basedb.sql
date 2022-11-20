@@ -25,6 +25,10 @@ INSERT INTO public."PaymentTerm"(id, unit)
 	(3, '월'),
 	(4, '분기');
 
+INSERT INTO public."User"(id, email, password, name, address, is_seller, signup_method_id, join_date, is_active, is_admin)
+ VALUES 
+ (1, 'consumer1@mail.com', 1234, '구매자1', '구매자의주소', false, 1, '2022-11-19', true, false),
+ (2, 'seller1@mail.com', 1234, '판매자1', '판매자의주소', true, 1, '2022-11-19', true, false);
 
 INSERT INTO public."Product"(
 	id, seller_id, category_id, product_group_name, product_name, subtitle, payment_term_id, register_date, update_date, price, image, description, views, num_of_subscribers)
@@ -126,12 +130,6 @@ INSERT INTO public."Product"(
         	'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_processed_food_tuna.jpg','참치 통조림 다양하게 먹고 싶은 사람만~',
 			11, 2);
 
-INSERT INTO public."User"(email, password, name, address, is_seller, signup_method_id, join_date, is_active)
- VALUES 
- ('consumer1@mail.com', 1234, '구매자1', '구매자의주소', false, 1, '2022-11-19', true),
- ('seller1@mail.com', 1234, '판매자1', '판매자의주소', true, 1, '2022-11-19', true);
-
-
 INSERT INTO public."ProductImages"(id, image, product_id)
 	VALUES
 	(1, 'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_crawling_news_politics_detail1.jpg', 2),
@@ -140,11 +138,6 @@ INSERT INTO public."ProductImages"(id, image, product_id)
 	(4, 'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_crawling_news_it_detail2.jpg', 1),
 	(5, 'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_processed_food_spam_detail1.jpg', 7),
 	(6, 'https://moagudok.s3.ap-northeast-2.amazonaws.com/test_image/product_processed_food_tuna_detail1.jpg', 8);
-
-
-DELETE FROM public."ProductImages";
-DELETE FROM public."Product";
-
 
 INSERT INTO public."payment"(id, consumer_id, seller_id, product_id, price, subscription_date, expiration_date, payment_due_date)
 	VALUES
@@ -159,12 +152,3 @@ INSERT INTO public."payment"(id, consumer_id, seller_id, product_id, price, subs
 	(9, 1, 2, 7, 25000, '2022-10-20', '2022-11-19', '2022-11-20'), -- (구독중), (오늘만료)
 	(10, 1, 2, 8, 15000, '2022-09-23', '2022-10-22', '2022-10-23'),
 	(11, 1, 2, 8, 15000, '2022-10-23', '2022-11-22', '2022-11-23'); -- (구독중), (만료 7일 전)
-
-
-# (구독중), (오늘만료), (구독만료), (만료 7일 전)
-# pay_term이 일인데 만료가 7일 전 인경우
-# pay_term이 주인데 만료가 7일 전 인경우
-
-# subscription_date : 구독시작일
-# expiration_date : 만료예정일
-# payment_due_date : 결제예정일
