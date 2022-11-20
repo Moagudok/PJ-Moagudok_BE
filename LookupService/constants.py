@@ -25,4 +25,5 @@ OTHER_PRODUCTS_NUM_IN_SELLER = 5
 CACHE_KEY = 'CATEGORY_LIST'
 
 # IP
-AWS_IP = os.environ.get('AWS_HOST') + ':' + os.environ.get('AWS_PAYMENT_SVC_PORT')
+AWS_PAYMENT_IP = os.environ.get('AWS_HOST') + ':' + os.environ.get('AWS_PAYMENT_SVC_PORT')
+AWS_AUTH_IP = os.environ.get('AWS_HOST') + ':' + os.environ.get('AWS_AUTH_SVC_PORT')

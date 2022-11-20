@@ -1,6 +1,6 @@
 import json
 import requests
-from constants import AWS_IP
+from constants import AWS_AUTH_IP
 from django.conf import settings
 
 def get_userinfo(request):
@@ -10,7 +10,7 @@ def get_userinfo(request):
     mode = getattr(settings, 'MODE', 'PRODUCTION')  
     print('====mode:', mode)
     if mode == 'PRODUCTION':
-        url = 'http://' + AWS_IP + '/user'
+        url = 'http://' + AWS_AUTH_IP + '/user'
     else:
         url = 'http://127.0.0.1:8000/user'
 
