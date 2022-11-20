@@ -1,5 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.exceptions import ErrorDetail
 from rest_framework import status
 from django.db import transaction
 from datetime import datetime
@@ -34,6 +35,8 @@ class SearchLatestTextListView(APIView):
         db_obj = MongoConnectorbySingleton()
         db_col = db_obj.collection
         user_id = get_userinfo(request)
+        if user_id == None:
+            return Response(ErrorDetail(string='Auth Service is not working', code=500),status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         recent_searchs = list(db_col.find( {'user_id': user_id }, {'_id':False} ).limit(RECENT_TEXT_COUNT).sort('dt', -1)) # 
         results =  json.dumps(recent_searchs, default=json_util.default)
         return Response(results, status=status.HTTP_200_OK)
