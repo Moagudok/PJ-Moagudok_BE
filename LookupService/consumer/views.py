@@ -32,13 +32,7 @@ class ProductCategoryListView(APIView):
 # url : /consumer/product/category
 class ProductCategoryListView(APIView):
     def get(self, request):
-        cache_value = cache.get(CACHE_KEY, None)
-        if cache_value == None:
-            category_data = Category.objects.all()
-            CategorySerializer_data = CategoryListSerializer(category_data, many=True).data
-            CategorySerializer_json_data = json.dumps(CategorySerializer_data)
-            cache.set(CACHE_KEY, CategorySerializer_json_data) # key, value, expriation time
-            cache_value = CategorySerializer_json_data
+
         return Response(cache_value, status.HTTP_200_OK)
 
 class ProductListPaginationClass(PageNumberPagination): # 
@@ -121,7 +115,16 @@ class ProductDetailView(APIView):
 # url : /consumer/home/
 class HomeView(APIView):
     def get(self, request):
-        categories = Category.objects.all()
+        # 1) category 조회 by caching
+        categor_cache_value = cache.get(CACHE_KEY, None)
+        if categor_cache_value == None:
+            category_data = Category.objects.all()
+            CategorySerializer_data = CategoryListSerializer(category_data, many=True).data
+            CategorySerializer_json_data = json.dumps(CategorySerializer_data)
+            cache.set(CACHE_KEY, CategorySerializer_json_data) # key, value, expriation time
+            categor_cache_value = CategorySerializer_json_data
+
+        # 2) 인기 상품 조회 && 3) 신규 상품 조회
         popular_products = Product.objects.all().order_by('-num_of_subscribers')
         new_products = Product.objects.all().order_by('-update_date')
         
@@ -129,11 +132,12 @@ class HomeView(APIView):
         popular_products = popular_products[:PRODUCT_NUM] # 내림차순 구독자 수
         new_products = new_products[:PRODUCT_NUM] # 내림차순 update 기준 (-id도 가능)
 
-        categories_data = CategoryListSerializer(categories, many=True).data
         popular_products_data = ProductListSerializer(popular_products, many=True).data
         new_products_data = ProductListSerializer(new_products, many=True).data
+
+        # 4) Response
         return Response({
-                'categories':categories_data, 
+                'categories':categor_cache_value, 
                 'popular_products':popular_products_data, 
                 'new_products':new_products_data,
             }, status=status.HTTP_200_OK)

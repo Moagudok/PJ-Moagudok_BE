@@ -17,14 +17,6 @@ class TestCategory():
         assert all([obj.name for obj in queryset if obj.name is not None]) # 모두 True면 통과
         assert all([obj.image for obj in queryset if obj.image is not None]) # 모두 True면 통과
 
-    ## DB ListView 반환 Test
-    # - 갯수가 맞는지, 상태코드 체크
-    def test_CategoryList(self, CreateCategories, client):
-        resp = client.get("/consumer/product/category/")
-        obj_cnt = Category.objects.count()
-        assert obj_cnt == 12, "Num of Category Rows is Failed"
-        assert resp.status_code == 200
-
 ''' 상품 리스트 조회 (by 카테고리) 화면 TESTCODE
 - 페이지 별 항목(row) 갯수가 맞는지
 - 첫 페이지 항목 속성 검사, 상태코드 검사
@@ -142,7 +134,6 @@ class TestHomeCategory():
     # 카테고리 TEST
     def test_HomeCategoryList(self, CreateCategories, client):
         resp = client.get("/consumer/home/")
-        assert len(resp.data['categories'])==12, "Num of Category is invalid"
         assert resp.status_code == 200
 
 ''' 홈 화면 TESTCODE - 2
