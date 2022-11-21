@@ -1,16 +1,27 @@
 package org.payment.controller;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.payment.DTO.PaymentRequestDTO;
 import org.payment.entity.Payment;
 import org.payment.service.PaymentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.BodyInserter;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping({"/payment"})
@@ -20,12 +31,24 @@ public class PaymentApiController {
 
     // 결제 내역 생성
     @PostMapping
-    public ResponseEntity<Payment> save(@RequestBody Payment params) {
-        return ResponseEntity.ok(paymentService.save(params));
+    public ResponseEntity<?> save(@RequestBody Payment params) {
+        Payment payment = paymentService.save(params);
+        // webclient
+        WebClient webClient = WebClient.create("localhost:8000");
+        webClient.put()
+                .body(BodyInserters.fromFormData("productId", "1"))
+                .retrieve()
+                .bodyToMono(String.class);
+        return new ResponseEntity<>("결제 성공",HttpStatus.OK);
     }
+//    // PRG pattern
+//    @GetMapping("/success")
+//    public ResponseEntity<?> success(){
+//        return  new ResponseEntity<>("201", HttpStatus.CREATED);
+//    }
     // 전체 결제 내역 조회
     @GetMapping
-    public ResponseEntity<List<Payment>> findAll() {
+    public ResponseEntity<?> findAll() {
         return ResponseEntity.ok(paymentService.findAll());
     }
     // 소비자 결제 내역 조회
