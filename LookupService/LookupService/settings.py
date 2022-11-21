@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'sharedb',
     "consumer",
-    "search",
     'rest_framework',
 ]
 
