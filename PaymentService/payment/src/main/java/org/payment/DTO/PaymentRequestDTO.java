@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.payment.entity.Payment;
 
+import javax.persistence.Table;
+
 @Getter
 @NoArgsConstructor
 public class PaymentRequestDTO {
@@ -14,7 +16,7 @@ public class PaymentRequestDTO {
     private Integer price;
     private LocalDate subscriptionDate;
     private LocalDate expirationDate;
-    private String paymentDue;
+    private LocalDate paymentDueDate;
     private Long consumerId;
     private Long sellerId;
 
@@ -24,7 +26,7 @@ public class PaymentRequestDTO {
                 .price(this.price)
                 .subscriptionDate(this.subscriptionDate)
                 .expirationDate(this.expirationDate)
-                .paymentDue(this.paymentDue)
+                .paymentDueDate(this.paymentDueDate)
                 .consumerId(this.consumerId)
                 .sellerId(this.sellerId)
                 .build();
@@ -35,14 +37,14 @@ public class PaymentRequestDTO {
                    Integer price,
                    LocalDate subscriptionDate,
                    LocalDate expirationDate,
-                   String paymentDue,
+                   LocalDate paymentDueDate,
                    Long consumerId,
                    Long sellerId) {
         this.productId = productId;
         this.price = price;
         this.subscriptionDate = subscriptionDate;
         this.expirationDate = expirationDate;
-        this.paymentDue = paymentDue;
+        this.paymentDueDate = paymentDueDate;
         this.consumerId = consumerId;
         this.sellerId = sellerId;
     }

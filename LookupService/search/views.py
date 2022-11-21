@@ -1,11 +1,12 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
+from rest_framework import status
 from django.db import transaction
 from datetime import datetime
 from .db import MongoConnectorbySingleton
-from constants import RECENT_TEXT_COUNT, TOPHITS_TEXT_COUNT
+from utils import get_userinfo
+from constants import RECENT_TEXT_COUNT, TOPHITS_TEXT_COUNT, DEBUG_PRINT
 
 from datetime import datetime, timedelta
 import json
@@ -18,13 +19,13 @@ class SearchLatestTextListView(APIView):
         search_text = self.request.data['search']
 
         db_obj = MongoConnectorbySingleton()
-        print('======', db_obj)
         db_col = db_obj.collection
         
         is_searched = db_col.find_one({'searchText':search_text})
         if is_searched == None:
+            user_id = get_userinfo(request)
             db_col.insert_one(
-                {'user_id' : 2,'searchText': search_text,'dt': datetime.now()},
+                {'user_id' : user_id,'searchText': search_text,'dt': datetime.now()},
             )
         else:
             db_col.update_one({'_id':is_searched['_id']}, {'$set':{'dt':datetime.now()}})
@@ -33,19 +34,18 @@ class SearchLatestTextListView(APIView):
     def get(self, request):
         db_obj = MongoConnectorbySingleton()
         db_col = db_obj.collection
-        recent_searchs = list(db_col.find( {'user_id':1}, {'_id':False} ).limit(RECENT_TEXT_COUNT).sort('dt', -1)) # 
-
-
+        user_id = get_userinfo(request)
+        if user_id == None:
+            return Response(ErrorDetail(string='Auth Service is not working', code=500),status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        recent_searchs = list(db_col.find( {'user_id': user_id }, {'_id':False} ).limit(RECENT_TEXT_COUNT).sort('dt', -1)) # 
         results =  json.dumps(recent_searchs, default=json_util.default)
         return Response(results, status=status.HTTP_200_OK)
 
 # url : /search/tophits
 class SearchTopHitTextListView(APIView):
     def get(self, request):
-        DEBUG = True
         db_obj = MongoConnectorbySingleton()
         db_col = db_obj.collection
-        print('======', db_obj)
  
         pipeline = [
             { # 조건
@@ -58,18 +58,12 @@ class SearchTopHitTextListView(APIView):
                 }
             },
             { # 정렬
-                '$sort': {'count' : -1}
+                '$sort': {'count' : -1} # 내림차순
             }
         ]
 
         # aggreagte의 제약 가능한 메모리 조작은 100MB로, 초과시 allowDiskUse=True 지정 필요
-        tophits_search_text = list(db_col.aggregate(pipeline)) 
-        if DEBUG: print('tophits_search_text', tophits_search_text)
+        tophits_search_text = list(db_col.aggregate(pipeline))[:TOPHITS_TEXT_COUNT] # 10개
+        if DEBUG_PRINT: print('tophits_search_text', tophits_search_text)
         results =  json.dumps(tophits_search_text, default=json_util.default)
         return Response(results, status=status.HTTP_200_OK)
-
-#         # db_col.insert_many([
-#         #     {'username' : 1,'searchText': 'abcd','datetime': datetime.now()},
-#         #     {'username' : 1,'searchText': 'abcd'+'2','datetime': datetime.now()},
-#         #     {'username' : 1,'searchText': 'abdc'+'3','datetime': datetime.now()},
-#         # ])

@@ -8,25 +8,19 @@ import java.time.LocalDate;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "Payment")
 @Getter
 @NoArgsConstructor
+@Table(schema = "public", name = "payment")
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-   private Long productId;
-    @Column
+    private Long productId;
     private Integer price;
-    @Column
     private LocalDate subscriptionDate;
-    @Column
     private LocalDate expirationDate;
-    @Column
-    private String paymentDue;
-    @Column
+    private LocalDate paymentDueDate;
     private Long consumerId;
-    @Column
     private Long sellerId;
 
     @Builder
@@ -34,14 +28,14 @@ public class Payment {
                    Integer price,
                    LocalDate subscriptionDate,
                    LocalDate expirationDate,
-                   String paymentDue,
+                   LocalDate paymentDueDate,
                    Long consumerId,
                    Long sellerId) {
         this.productId = productId;
         this.price = price;
         this.subscriptionDate = subscriptionDate;
         this.expirationDate = expirationDate;
-        this.paymentDue = paymentDue;
+        this.paymentDueDate = paymentDueDate;
         this.consumerId = consumerId;
         this.sellerId = sellerId;
     }

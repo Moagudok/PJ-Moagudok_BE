@@ -17,7 +17,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # TEST MODE
-MODE = "PRODUCTION"
+MODE = "LOCAL"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "sharedb",
     "seller",
+    'mail',
 ]
 
 MIDDLEWARE = [
@@ -127,6 +128,14 @@ else: # MODE=LOCAL
             'PORT':os.environ.get("DB_PORT"),
         }
     }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = os.environ.get("GMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("GMAIL_HOST_PASSWORD") # gmail or naver 2단계 보안 인증 - 앱 비밀번호 
+EMAIL_PORT = int(os.environ.get("GMAIL_PORT"))# gmail, naver SMTP 포트 
+EMAIL_USE_TLS = True # TLS Setting
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

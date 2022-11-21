@@ -135,6 +135,13 @@ else: # MODE=LOCAL
         }
     }
 
+CACHES = {
+    'default':{
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://'+ os.environ.get("AWS_HOST") +':6379',
+    }
+}
+
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 

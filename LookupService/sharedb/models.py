@@ -19,21 +19,23 @@ class SignupMethod(models.Model):
 
 class UserManager(BaseUserManager):
     #일반 유저 생성
-    def create_user(self, email, password=None):
+    def create_user(self, email, is_seller, password=None):
         if not email:
             raise ValueError('must have an email')
         user = self.model(
-            email=email
+            email=email,
+            is_seller=is_seller
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
     
     # 관리자 계정 생성
-    def create_superuser(self, email, password=None):
+    def create_superuser(self, email,is_seller, password=None):
         user = self.create_user(
             email=email,
-            password=password
+            password=password,
+            is_seller=is_seller
         )
         user.is_admin = True
         user.save(using=self._db)
@@ -49,7 +51,9 @@ class User(AbstractBaseUser):
     signup_method = models.ForeignKey(SignupMethod, verbose_name="가입방법", on_delete=models.SET_NULL, null=True)
     is_active = models.BooleanField(default=True) # 계정활성화 여부
     is_seller = models.BooleanField(default=False) # 판매자 여부
+    is_admin = models.BooleanField(default=False) # 판매자 여부
     USERNAME_FIELD = 'email' # 로그인 시 사용할 필드 지정
+    REQUIRED_FIELDS= ["is_seller"]
 
     objects = UserManager() # custom user 생성 시 필요
 
@@ -77,6 +81,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null = True)
     product_group_name = models.CharField("상품 그룹명", max_length=30)
     product_name = models.CharField("상품명", max_length=30)
+    subtitle = models.CharField("상품간단설명", max_length=50)
     payment_term = models.ForeignKey(PaymentTerm, verbose_name = "구독 기간 단위", on_delete=models.SET_NULL, null=True) 
     register_date = models.DateField("상품 최초 등록일", auto_now_add=True) 
     update_date = models.DateField("상품 수정일", auto_now=True)
@@ -109,4 +114,4 @@ class Payment(models.Model):
     payment_due_date = models.DateField("결제예정일", auto_now=True)
     
     class Meta:
-        db_table = 'Payment'
+        db_table = 'payment'

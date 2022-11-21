@@ -1,23 +1,15 @@
 package org.payment.service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import org.payment.DTO.PaymentRequestDTO;
-import org.payment.DTO.PaymentResponseDTO;
 import org.payment.entity.Payment;
 import org.payment.entity.PaymentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +17,8 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public Long save(PaymentRequestDTO params) {
-        return paymentRepository.save(params.toEntity()).getId();
+    public Payment save(Payment payment) {
+        return paymentRepository.save(payment);
     }
     @Transactional
     public List<Payment> findAll() {
@@ -42,7 +34,7 @@ public class PaymentService {
     }
     @Transactional
     public List<Payment> sub_product(Long consumerId, LocalDate localDate){
-        return paymentRepository.findByConsumerIdAndExpirationDateGreaterThan(consumerId, localDate);
+        return paymentRepository.findByConsumerIdAndExpirationDateGreaterThanEqual(consumerId, localDate);
     }
     @Transactional
     public List<Payment> exp_today(Long consumerId, LocalDate localDate){
@@ -56,6 +48,27 @@ public class PaymentService {
     public List<Payment> exp_7ago(Long consumerId, LocalDate now, LocalDate ago){
         return paymentRepository.findByConsumerIdAndExpirationDateBetween(consumerId, now, ago);
     }
-
+    // 가상 정기 결제
+    // 실결제는 X , 일정 시간 paymentDueDate 조회하여
+    // 날짜 한달 뒤인 새로운 payment 자동 생성
+    @Scheduled(cron = "0 0 11 * * *") // 매일 오전 11시 마다
+    public void scheduleRun(){
+        System.out.println("Run method per 30sec");
+        List<Payment> paymentList = paymentRepository.findByPaymentDueDate(LocalDate.now());
+        for(Payment data : paymentList){
+            System.out.println("ID " + data.getId());
+            Payment entity = Payment.builder()
+                    .price(data.getPrice())
+                    .productId(data.getProductId())
+                    .consumerId(data.getConsumerId())
+                    .sellerId(data.getSellerId())
+                    .subscriptionDate(LocalDate.now())
+                    .expirationDate(LocalDate.now().plusMonths(1))
+                    .paymentDueDate(LocalDate.now().plusMonths(1))
+                    .build();
+            Payment newPayment = paymentRepository.save(entity);
+            System.out.println("ID " + newPayment.getId());
+        }
+    }
 
 }
