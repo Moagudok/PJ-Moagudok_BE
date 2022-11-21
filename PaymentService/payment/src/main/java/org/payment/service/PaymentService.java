@@ -53,7 +53,6 @@ public class PaymentService {
     // 날짜 한달 뒤인 새로운 payment 자동 생성
     @Scheduled(cron = "0 0 11 * * *") // 매일 오전 11시 마다
     public void scheduleRun(){
-        System.out.println("Run method per 30sec");
         List<Payment> paymentList = paymentRepository.findByPaymentDueDate(LocalDate.now());
         for(Payment data : paymentList){
             System.out.println("ID " + data.getId());

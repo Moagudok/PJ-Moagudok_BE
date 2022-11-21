@@ -34,9 +34,10 @@ public class PaymentApiController {
     public ResponseEntity<?> save(@RequestBody Payment params) {
         Payment payment = paymentService.save(params);
         // webclient
-        WebClient webClient = WebClient.create("localhost:8000");
+        WebClient webClient = WebClient.create("http://52.79.143.145:8001/");
         webClient.put()
-                .body(BodyInserters.fromFormData("productId", "1"))
+                .uri("/consumer/product/subscriber")
+                .body(BodyInserters.fromFormData("product_id", payment.getProductId().toString()))
                 .retrieve()
                 .bodyToMono(String.class);
         return new ResponseEntity<>("결제 성공",HttpStatus.OK);
