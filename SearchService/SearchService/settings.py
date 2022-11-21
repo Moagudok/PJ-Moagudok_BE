@@ -12,7 +12,7 @@ MODE = "LOCAL_TEST"
 
 # SECURITY WARNING: keep the secret key used in production secret!
 if MODE=="LOCAL_TEST" or MODE=='LOCAL':
-    SECRET_KEY = "django-insecure-h!ojgwre1e58)16&bmuve3mn#dnll#dt&eoo14!rq2s3bffkn2"
+    SECRET_KEY = "django-insecure-e%r99ictx27ehcxh0&qdbj^vn63pg%*#isp&xq_7magm(^n=jz"
 else: # MODE = PRODUCTION
     SECRET_KEY = os.environ.get('SECRET_KEY')
 
@@ -33,15 +33,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'sharedb',
-    "consumer",
-    'rest_framework',
+    "search",
 ]
-
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS' : 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE' : 2,
-}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -53,7 +46,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'LookupService.urls'
+ROOT_URLCONF = 'SearchService.urls'
 
 TEMPLATES = [
     {
@@ -71,63 +64,20 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'LookupService.wsgi.application'
+WSGI_APPLICATION = 'SearchService.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-''' # sqlite
+# sqlite
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR.parent / 'db.sqlite3',
     }
 }
-'''
 
-# PostgreSQL
-if MODE == 'LOCAL_TEST' or MODE == 'LOCAL':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'moa_gudok', # Schema Name
-            'USER': 'postgres', 
-            'PASSWORD': 'rlatjsals1!', # PASSWORD
-            'HOST': '127.0.0.1', 
-            'PORT': '5432', 
-        }
-    }
-elif MODE == 'PRODUCTION':
-    DATABASES = {
-        'default': {
-            'ENGINE': os.environ.get("PRODUCTION_ENGINE"),
-            'NAME': os.environ.get("PRODUCTION_NAME"), # Schema Name
-            'USER': os.environ.get("PRODUCTION_USER"),
-            'PASSWORD': os.environ.get("PRODUCTION_PASSWORD"), # PASSWORD
-            'HOST':os.environ.get("PRODUCTION_HOST"),
-            'PORT':os.environ.get("PRODUCTION_PORT"),
-        }
-    }
-# NOT TESTING MODE
-else: # MODE=LOCAL
-    DATABASES = {
-        'default': {
-            'ENGINE': os.environ.get("DB_ENGINE"),
-            'NAME': os.environ.get("DB_NAME"), # Schema Name
-            'USER': os.environ.get("DB_USER"),
-            'PASSWORD': os.environ.get("DB_PASSWORD"), # PASSWORD NAME
-            'HOST':os.environ.get("DB_HOST"),
-            'PORT':os.environ.get("DB_PORT"),
-        }
-    }
-
-CACHES = {
-    'default':{
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://'+ os.environ.get("AWS_HOST") +':6379',
-    }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -153,12 +103,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Seoul'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
-USE_I18N = True
 
-USE_TZ = False  # 원래 True KOREA Time을 위한 False 설정
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -170,6 +119,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-AUTH_USER_MODEL = "sharedb.User"
-
