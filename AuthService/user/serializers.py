@@ -25,8 +25,6 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("이름은 2자 이상이어야 합니다.")
         return data
     def validate_password(self, data):
-        if not data:
-            raise serializers.ValidationError("비밀번호를 입력해주세요")
         if len(data) < 8:
             raise serializers.ValidationError("비밀번호는 8자 이상이어야 합니다.")
         return data
