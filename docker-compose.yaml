@@ -1,6 +1,12 @@
 version: "3.8"
 
 services:
+  redis:
+    image: redis:5
+    command: redis-server --port 6379
+    ports:
+      - 6379:6379
+      
   nginx:
     build: ./_nginx
     ports:
@@ -61,4 +67,4 @@ services:
       - SPRING.JPA.PROPERTIES.HIBERNATE.FORMAT_SQL=true
       - SPRING.JPA.DATABASE-PLATFORM=org.hibernate.dialect.PostgreSQLDialect
       - SPRING.JPA.GENERATE-DDL=true
-    
+      - SPRING.JPA.HIBERNATE.DDL-AUTO=validate    

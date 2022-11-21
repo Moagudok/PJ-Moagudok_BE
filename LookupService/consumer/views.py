@@ -6,16 +6,40 @@ from rest_framework.exceptions import ErrorDetail
 
 from django.db import transaction
 from django.db.models import Q, F
+from django.core.cache import cache
+
 from sharedb.models import Category, Product
 from .serializers import CategoryListSerializer, ProductListSerializer, ProductDetailSerializer
-from constants import COOKIE_KEY_NAME, EXPIRED_TIME, STANDARD_NUM_OF_PRODUCTS, PER_PAGE_SIZE
+from constants import COOKIE_KEY_NAME, EXPIRED_TIME, \
+    STANDARD_NUM_OF_PRODUCTS, PER_PAGE_SIZE, \
+    DEBUG_PRINT, OTHER_PRODUCTS_NUM_IN_SELLER, \
+    AWS_PAYMENT_IP, CACHE_KEY
+from utils import get_userinfo
 
-# url : /consumer/product/category
+import random
+import requests
+import json
+
+''' Before Caching Code
 class ProductCategoryListView(APIView):
     def get(self, request):
         category_data = Category.objects.all()
         CategorySerializer_data = CategoryListSerializer(category_data, many=True).data
         return Response(CategorySerializer_data, status.HTTP_200_OK)
+'''
+
+# After Caching Code
+# url : /consumer/product/category
+class ProductCategoryListView(APIView):
+    def get(self, request):
+        cache_value = cache.get(CACHE_KEY, None)
+        if cache_value == None:
+            category_data = Category.objects.all()
+            CategorySerializer_data = CategoryListSerializer(category_data, many=True).data
+            CategorySerializer_json_data = json.dumps(CategorySerializer_data)
+            cache.set(CACHE_KEY, CategorySerializer_json_data) # key, value, expriation time
+            cache_value = CategorySerializer_json_data
+        return Response(cache_value, status.HTTP_200_OK)
 
 class ProductListPaginationClass(PageNumberPagination): # 
     page_size = PER_PAGE_SIZE # settings.py의 Default 값 변경
@@ -43,8 +67,7 @@ class ProductListPaginationViewSet(viewsets.ModelViewSet):
 class ProductDetailView(APIView):
     @transaction.atomic
     def get(self, request, product_id):
-        DEBUG = True # 쿠키값, json 값 확인을 위한 parameter
-
+        # GET Product by product_id
         try:
             detail_product = Product.objects.get(id = product_id)
         except:
@@ -52,11 +75,11 @@ class ProductDetailView(APIView):
 
         # Cookies에 담긴 product id list
         try: # Cookies 존재시
-            cookies = request.headers['Cookie']
-            cookies = cookies.split(';')
-            if DEBUG: print('Cookies List : ', cookies)
+            cookies = request.headers['Cookie'].split(';')
+            if DEBUG_PRINT: print('Cookies List : ', cookies)
+            # visitedproduct2=T; visitedproduct4=T ==> [2, 4]
             p_id_list = [int(cookie.strip().replace(COOKIE_KEY_NAME, '').replace('=T','')) for cookie in cookies if COOKIE_KEY_NAME in cookie]
-        except: # cookie 없으면
+        except: # cookie 없으면 (첫방문)
             p_id_list = []
 
         # 현재 상품 product_id 방문이력 없으면
@@ -65,11 +88,23 @@ class ProductDetailView(APIView):
             detail_product.save()
             detail_product.refresh_from_db() # save 한 DB 재 호출
             
+        # 해당 판매자의 다른 상품들 (not detail_product.id, seller_id)
+        condition = Q()
+        condition.add(Q(seller=detail_product.seller), condition.AND)
+        condition.add(~Q(id=product_id), condition.AND)
+        other_prducts = list(Product.objects.filter(condition))
+        random.shuffle(other_prducts)
+        other_prducts = other_prducts[:OTHER_PRODUCTS_NUM_IN_SELLER]
+
         # Serializers
         detail_product_data = ProductDetailSerializer(detail_product).data
+        other_products_data = ProductListSerializer(other_prducts, many=True).data
 
         # Response Cookie Settings
-        response = Response(detail_product_data, status=status.HTTP_200_OK)
+        response = Response(
+            {'detail_product_data': detail_product_data, 'other_products_data': other_products_data}, 
+            status=status.HTTP_200_OK
+        )
 
         # 현재 상품 product_id 방문이력 없을 때만
         if product_id not in p_id_list:
@@ -89,7 +124,6 @@ class HomeView(APIView):
         categories = Category.objects.all()
         popular_products = Product.objects.all().order_by('-num_of_subscribers')
         new_products = Product.objects.all().order_by('-update_date')
-
         
         PRODUCT_NUM = min(Product.objects.count(), STANDARD_NUM_OF_PRODUCTS) # 현재 Product 갯수가 NUM_OF_PRODUCTS (10) 보다 적을 때
         popular_products = popular_products[:PRODUCT_NUM] # 내림차순 구독자 수
@@ -104,19 +138,53 @@ class HomeView(APIView):
                 'new_products':new_products_data,
             }, status=status.HTTP_200_OK)
 
-''' legacy code 
-def list(self, request):
-    category_id = request.query_params['category']
-    if not category_id.isdigit():
-        return Response({'message':'Params is invalid'}, status.HTTP_400_BAD_REQUEST)
-
-    product_data = Product.objects.filter(category_id=category_id)
-    if len(product_data) == 0:
-        return Response({'message':'There are no products in this category'}, status.HTTP_200_OK)
-
-    ProductSerializer_data = ProductListSerializer(product_data, many=True).data
-    return Response(ProductSerializer_data, status.HTTP_200_OK)
-
-    # serializer = UserSerializer(queryset, many=True)
-    # return Response(serializer.data)
+''' 마이페이지
+(1) 구독 중 { consumerId : request.user, type : sub }
+(2) 구독 만료 7일 전 - { consumerId : request.user, type : 7ago }
+(3) 구독 종료 당일 - { consumerId : request.user, type : now }
+(4) 구독 만료 상품 - { consumerId : request.user, type : exp }
 '''
+# url : /consumer/mypage/
+class MypageView(APIView):
+    def get(self, request):
+        type_value = request.query_params['type']
+
+        # GET user_id
+        user_id = get_userinfo(request)
+
+        # TO Payment Service
+        try:
+            response = requests.get('http://' + AWS_PAYMENT_IP + '/payment/consumer/mypage?'\
+                +'consumerId='+str(user_id)+'&'\
+                +'type='+type_value)
+            if response.status_code == status.HTTP_404_NOT_FOUND:
+                return Response(ErrorDetail(string='URL Params is invalid', code=404),statuHTTP_404_NOT_FOUND=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except:
+            return Response(ErrorDetail(string='Payment Service is not working', code=500),status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # Convert Json     
+        product_id_json = json.loads(response.text)
+        mypage_products = Product.objects.filter(id__in = product_id_json).order_by('-update_date')
+        mypage_products_data = ProductListSerializer(mypage_products, many=True).data
+        return Response(mypage_products_data, status=status.HTTP_200_OK)
+
+# url : /consumer/product/subscriber   - body : {product_id : 2}
+class ManageSubscriber(APIView):
+    @transaction.atomic
+    def put(self, request):
+        # GET 
+        product_id = request.data['product_id']
+
+        # GET Product by product_id
+        try:
+            detail_product = Product.objects.get(id = product_id)
+        except:
+            return Response(ErrorDetail(string = '존재하지 않는 구독 상품 입니다.', code=404), status=status.HTTP_404_NOT_FOUND)
+
+        # subscribers 증가
+        try:
+            detail_product.num_of_subscribers = F("num_of_subscribers") + 1
+            detail_product.save()
+            return Response({'detail':'구독자 수 반영 완료'},status=status.HTTP_200_OK)
+        except:
+            return Response(ErrorDetail(string='내부 오류로 구독자 수 반영 실패', code=500),status=status.HTTP_500_INTERNAL_SERVER_ERROR)
