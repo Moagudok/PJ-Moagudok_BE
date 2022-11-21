@@ -23,12 +23,17 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_name(self, data):
         if len(data) < 2:
             raise serializers.ValidationError("이름은 2자 이상이어야 합니다.")
+        return data
     def validate_password(self, data):
+        if not data:
+            raise serializers.ValidationError("비밀번호를 입력해주세요")
         if len(data) < 8:
             raise serializers.ValidationError("비밀번호는 8자 이상이어야 합니다.")
+        return data
     def validate_address(self, data):
         if len(data) < 5:
             raise serializers.ValidationError("주소는 5자 이상이어야 합니다.")
+        return data
 
 class LoginUserSerializer(serializers.Serializer):
     email = serializers.EmailField()
