@@ -4,4 +4,5 @@ django-cors-headers
 gunicorn
 django-dotenv
 requests
+pymongo
 # psycopg2-binary : EC2-Linux
