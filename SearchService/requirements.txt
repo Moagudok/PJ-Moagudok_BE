@@ -1,0 +1,7 @@
+Django
+djangorestframework
+django-cors-headers
+gunicorn
+django-dotenv
+requests
+# psycopg2-binary : EC2-Linux
