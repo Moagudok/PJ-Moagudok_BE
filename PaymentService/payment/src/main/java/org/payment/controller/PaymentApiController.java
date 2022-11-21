@@ -34,12 +34,13 @@ public class PaymentApiController {
     public ResponseEntity<?> save(@RequestBody Payment params) {
         Payment payment = paymentService.save(params);
         // webclient
-        WebClient webClient = WebClient.create("http://52.79.143.145:8001/");
+        WebClient webClient = WebClient.create();
         webClient.put()
-                .uri("/consumer/product/subscriber")
+                .uri("http://52.79.143.145:8001/consumer/product/subscriber")
                 .body(BodyInserters.fromFormData("product_id", payment.getProductId().toString()))
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(String.class)
+                .block();
         return new ResponseEntity<>("결제 성공",HttpStatus.OK);
     }
 //    // PRG pattern
