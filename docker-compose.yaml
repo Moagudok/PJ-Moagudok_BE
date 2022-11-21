@@ -16,6 +16,7 @@ services:
       - lookup_service
       - seller_service
       - payment_service
+      - search_service
 
   auth_service:
     build: ./AuthService/
@@ -49,6 +50,17 @@ services:
       - 8002
     env_file:
       - ./SellerService/.local.env
+
+  search_service:
+    build: ./SearchService/
+    command: gunicorn SearchService.wsgi:application --bind 0.0.0.0:8003
+    ports:
+      - 8003:8003
+    working_dir: /SearchService/
+    expose:
+      - 8003
+    env_file:
+      - ./SearchService/.local.env
 
   payment_service:
     container_name: spring
