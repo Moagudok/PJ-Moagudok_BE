@@ -7,6 +7,7 @@ package org.payment.entity;
 
 import java.time.LocalDate;
 import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -19,4 +20,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     List<Payment> findByConsumerIdAndExpirationDateLessThan(Long consumerId, LocalDate localDate);
     List<Payment> findByConsumerIdAndExpirationDateBetween(Long consumerId, LocalDate now, LocalDate ago);
     List<Payment> findByPaymentDueDate(LocalDate localDate);
+    List<Payment> findBySellerIdAndSubscriptionDateBetween(Long sellerId, LocalDate first, LocalDate last);
+    List<Payment> findBySellerIdAndProductIdAndSubscriptionDateBetween(Long sellerId, Long productId, LocalDate first, LocalDate last);
 }
