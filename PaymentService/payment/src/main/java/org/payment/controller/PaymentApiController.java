@@ -1,27 +1,18 @@
 package org.payment.controller;
 
-import java.net.URI;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
-import org.payment.DTO.PaymentRequestDTO;
 import org.payment.entity.Payment;
 import org.payment.service.PaymentService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping({"/payment"})
@@ -43,11 +34,6 @@ public class PaymentApiController {
                 .block();
         return new ResponseEntity<>("결제 성공",HttpStatus.OK);
     }
-//    // PRG pattern
-//    @GetMapping("/success")
-//    public ResponseEntity<?> success(){
-//        return  new ResponseEntity<>("201", HttpStatus.CREATED);
-//    }
     // 전체 결제 내역 조회
     @GetMapping
     public ResponseEntity<?> findAll() {
@@ -55,8 +41,8 @@ public class PaymentApiController {
     }
     // 소비자 결제 내역 조회
     @GetMapping("/consumer")
-    public ResponseEntity<List<Payment>> findByConsumerId(@RequestParam Long consumerId) {
-        return ResponseEntity.ok(paymentService.findByConsumerId(consumerId));
+    public List<Payment> findByConsumerId(@RequestParam Long consumerId) {
+        return paymentService.findByConsumerId(consumerId);
     }
     // 판매자 결제 내역 조회
     @GetMapping("/seller")
@@ -112,5 +98,37 @@ public class PaymentApiController {
             }
         }
     }
+    // 판매자의 선택한 월의 상품별 매출 및 구독자 수
+    @GetMapping("/dashboard")
+    public List<HashMap<String, Long>> salesOfMonth(@RequestParam Long sellerId, Integer month) {
+        LocalDate init = LocalDate.of(LocalDate.now().getYear(), month, LocalDate.now().getDayOfMonth());
+        LocalDate first = init.with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate last = init.with(TemporalAdjusters.lastDayOfMonth());
 
+        List<Payment> monthList = paymentService.salesOfMonth(sellerId, first, last);
+        List<HashMap<String, Long>> resultList = new ArrayList<>();
+
+        List<Long> productList = new ArrayList<>();
+        for (Payment payment : monthList){
+            productList.add(payment.getProductId());
+        }
+        // 중복제거
+        List<Long> idList = productList.stream().distinct().collect(Collectors.toList());
+
+        for (long productId : idList){
+            List<Payment> payments = paymentService.salesOfProduct(sellerId, productId, first, last);
+            long total_price = 0;
+            long total_count = 0;
+            for(Payment data : payments){
+                total_price += data.getPrice();
+                total_count += 1;
+            }
+            HashMap<String, Long> maps = new HashMap<>();
+            maps.put("product_id", productId);
+            maps.put("total_price", total_price);
+            maps.put("total_count", total_count);
+            resultList.add(maps);
+        }
+        return resultList;
+    }
 }
