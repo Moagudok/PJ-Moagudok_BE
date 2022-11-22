@@ -25,7 +25,7 @@ dependencies {
 	implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.23'
 	implementation 'io.github.cdimascio:dotenv-java:2.2.4'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux:2.7.5'
-	runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'org.postgresql:postgresql'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	developmentOnly "org.springframework.boot:spring-boot-devtools"

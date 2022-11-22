@@ -5,13 +5,14 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import org.payment.DTO.PaymentRequestDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.payment.entity.Payment;
 import org.payment.entity.PaymentRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class PaymentService {
     private final PaymentRepository paymentRepository;
@@ -69,5 +70,12 @@ public class PaymentService {
             System.out.println("ID " + newPayment.getId());
         }
     }
-
+    @Transactional
+    public List<Payment> salesOfMonth(Long sellerId, LocalDate first, LocalDate last){
+        return paymentRepository.findBySellerIdAndSubscriptionDateBetween(sellerId,first,last);
+    }
+    @Transactional
+    public List<Payment> salesOfProduct(Long sellerId, Long productId, LocalDate first, LocalDate last){
+        return paymentRepository.findBySellerIdAndProductIdAndSubscriptionDateBetween(sellerId,productId,first,last);
+    }
 }
