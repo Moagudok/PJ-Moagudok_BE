@@ -89,12 +89,11 @@ services:
       - SPRING.JPA.HIBERNATE.DDL-AUTO=validate    
 
   chatting_services:
-    node:
-      build: .
-      volumes:
-        - .:/ChattingService
-      working_dir: /ChattingService
-      ports:
-        - 8008:8008
-      command: node app.js
-      restart: always
+    build: .
+    volumes:
+      - .:/ChattingService
+    working_dir: /ChattingService
+    ports:
+      - 8008:8008
+    command: node app.js
+    restart: always
