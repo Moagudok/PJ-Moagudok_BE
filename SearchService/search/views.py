@@ -20,15 +20,18 @@ class SearchLatestTextListView(APIView):
 
         db_obj = MongoConnectorbySingleton()
         db_col = db_obj.collection
-        
-        is_searched = db_col.find_one({'searchText':search_text})
+
+        user_id = get_userinfo(request)
+        is_searched = db_col.find_one({'user_id':user_id, 'searchText':search_text})
         if is_searched == None:
-            user_id = get_userinfo(request)
             db_col.insert_one(
                 {'user_id' : user_id,'searchText': search_text,'dt': datetime.now()},
             )
         else:
-            db_col.update_one({'_id':is_searched['_id']}, {'$set':{'dt':datetime.now()}})
+            db_col.update_one(
+                {'_id':is_searched['_id']}, 
+                {'$set':{'dt':datetime.now()}}
+            )
         return Response({'detail':'success'}, status=status.HTTP_201_CREATED)
 
     def get(self, request):
