@@ -16,6 +16,7 @@ services:
       - 10002:10002
       - 10003:10003
       - 10004:10004
+      - 10005:10005
       
     depends_on:
       - auth_service
@@ -86,3 +87,14 @@ services:
       - SPRING.JPA.DATABASE-PLATFORM=org.hibernate.dialect.PostgreSQLDialect
       - SPRING.JPA.GENERATE-DDL=true
       - SPRING.JPA.HIBERNATE.DDL-AUTO=validate    
+
+  chatting_services:
+    node:
+      build: .
+      volumes:
+        - .:/ChattingService
+      working_dir: /ChattingService
+      ports:
+        - 8008:8008
+      command: node app.js
+      restart: always
