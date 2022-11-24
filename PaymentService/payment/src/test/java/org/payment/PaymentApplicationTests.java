@@ -15,7 +15,18 @@ class PaymentApplicationTests {
 	private PaymentRepository paymentRepository;
 
 	@Test
-	void testJPA() {
+	public void insert() {
+		Payment payment = Payment.builder()
+				.price(1000)
+				.consumerId(2L)
+				.subscriptionDate(LocalDate.now())
+				.paymentDueDate(LocalDate.now())
+				.expirationDate(LocalDate.now())
+				.sellerId(3L)
+				.productId(1L)
+				.build();
+		paymentRepository.save(payment);
+
 	}
 
 }
