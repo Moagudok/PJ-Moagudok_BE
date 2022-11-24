@@ -39,7 +39,7 @@ class ProductListPaginationViewSet(viewsets.ModelViewSet):
             mini_q.add(Q(product_name__icontains = search_text), condition.OR) # product_name - 대소문자 구분 X 검색
             mini_q.add(Q(product_group_name__icontains = search_text), condition.OR) # product_group_name - 대소문자 구분 X 검색
             condition.add(mini_q, condition.AND)
-        query_set = self.queryset.filter(condition)
+        query_set = self.queryset.filter(condition).select_related('payment_term')
         return query_set
 
 # url : /consumer/product/detail/{product_id}
@@ -154,7 +154,7 @@ class MypageView(APIView):
 
         # Convert Json     
         product_id_json = json.loads(response.text)
-        mypage_products = Product.objects.filter(id__in = product_id_json).order_by('-update_date')
+        mypage_products = Product.objects.filter(id__in = product_id_json).select_related('payment_term').order_by('-update_date')
         mypage_products_data = ProductListSerializer(mypage_products, many=True).data
         return Response(mypage_products_data, status=status.HTTP_200_OK)
 
