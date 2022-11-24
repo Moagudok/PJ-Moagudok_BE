@@ -20,21 +20,6 @@ import random
 import requests
 import json
 
-''' Before Caching Code
-class ProductCategoryListView(APIView):
-    def get(self, request):
-        category_data = Category.objects.all()
-        CategorySerializer_data = CategoryListSerializer(category_data, many=True).data
-        return Response(CategorySerializer_data, status.HTTP_200_OK)
-'''
-
-# After Caching Code
-# url : /consumer/product/category
-class ProductCategoryListView(APIView):
-    def get(self, request):
-
-        return Response(cache_value, status.HTTP_200_OK)
-
 class ProductListPaginationClass(PageNumberPagination): # 
     page_size = PER_PAGE_SIZE # settings.py의 Default 값 변경
 
