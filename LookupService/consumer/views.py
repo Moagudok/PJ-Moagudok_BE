@@ -71,7 +71,8 @@ class ProductDetailView(APIView):
         condition = Q()
         condition.add(Q(seller=detail_product.seller), condition.AND)
         condition.add(~Q(id=product_id), condition.AND)
-        other_prducts = list(Product.objects.filter(condition))
+        # other_prducts = list(Product.objects.filter(condition).prefetch_related('productimages_set'))
+        other_prducts = list(Product.objects.filter(condition).select_related('payment_term'))
         random.shuffle(other_prducts)
         other_prducts = other_prducts[:OTHER_PRODUCTS_NUM_IN_SELLER]
 
@@ -110,10 +111,8 @@ class HomeView(APIView):
             categor_cache_value = CategorySerializer_json_data
 
         # 2) 인기 상품 조회 && 3) 신규 상품 조회
-        popular_products = Product.objects.all().order_by('-num_of_subscribers')
-
-        # popular_products = Product.objects.all().select_related('payment_term').order_by('-num_of_subscribers')
-        new_products = Product.objects.all().order_by('-update_date')
+        new_products = Product.objects.all().select_related('payment_term').order_by('-update_date')
+        popular_products = Product.objects.all().select_related('payment_term').order_by('-num_of_subscribers')
         
         PRODUCT_NUM = min(Product.objects.count(), STANDARD_NUM_OF_PRODUCTS) # 현재 Product 갯수가 NUM_OF_PRODUCTS (10) 보다 적을 때
         popular_products = popular_products[:PRODUCT_NUM] # 내림차순 구독자 수
