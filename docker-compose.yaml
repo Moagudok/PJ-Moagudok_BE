@@ -11,6 +11,12 @@ services:
     build: ./_nginx
     ports:
       - 80:80
+      - 10000:10000
+      - 10001:10001
+      - 10002:10002
+      - 10003:10003
+      - 10004:10004
+      
     depends_on:
       - auth_service
       - lookup_service
@@ -34,7 +40,7 @@ services:
     command: gunicorn LookupService.wsgi:application --bind 0.0.0.0:8001
     ports:
       - 8001:8001
-    working_dir: /LookupService/ # 반드시 / 여야함
+    working_dir: /LookupService/
     expose:
       - 8001
     env_file:
