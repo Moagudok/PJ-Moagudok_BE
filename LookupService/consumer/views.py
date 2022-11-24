@@ -88,7 +88,7 @@ class ProductDetailView(APIView):
         # 현재 상품 product_id 방문이력 없을 때만
         if product_id not in p_id_list:
             response.set_cookie(
-                key = 'visitedproduct'+str(product_id), value='T', max_age = EXPIRED_TIME
+                key = COOKIE_KEY_NAME+str(product_id), value='T', max_age = EXPIRED_TIME
             )
         return response
 
@@ -111,6 +111,8 @@ class HomeView(APIView):
 
         # 2) 인기 상품 조회 && 3) 신규 상품 조회
         popular_products = Product.objects.all().order_by('-num_of_subscribers')
+
+        # popular_products = Product.objects.all().select_related('payment_term').order_by('-num_of_subscribers')
         new_products = Product.objects.all().order_by('-update_date')
         
         PRODUCT_NUM = min(Product.objects.count(), STANDARD_NUM_OF_PRODUCTS) # 현재 Product 갯수가 NUM_OF_PRODUCTS (10) 보다 적을 때
