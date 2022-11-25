@@ -88,12 +88,12 @@ services:
       - SPRING.JPA.GENERATE-DDL=true
       - SPRING.JPA.HIBERNATE.DDL-AUTO=validate    
 
-  chatting_services:
-    build: .
-    volumes:
-      - .:/ChattingService
-    working_dir: /ChattingService
-    ports:
-      - 8008:8008
-    command: node app.js
-    restart: always
+  # chatting_services:
+  #   build: .
+  #   volumes:
+  #     - .:/ChattingService
+  #   working_dir: /ChattingService
+  #   ports:
+  #     - 8008:8008
+  #   command: node app.js
+  #   restart: always
