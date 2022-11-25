@@ -155,8 +155,18 @@ class MypageView(APIView):
 
         # Convert Json     
         product_id_json = json.loads(response.text)
-        mypage_products = Product.objects.filter(id__in = product_id_json).order_by('-update_date')
+
+        p_key_list, p_val_list = [], []
+        for p_key, p_val in product_id_json[0].items():
+            p_key_list.append(int(p_key))
+            p_val_list.append(p_val)
+
+        mypage_products = Product.objects.filter(id__in = p_key_list).order_by('-update_date')
         mypage_products_data = ProductListSerializer(mypage_products, many=True).data
+        
+        for p_orderdict, p_val in zip(mypage_products_data, p_val_list):
+            p_orderdict.update({'period': p_val})
+            
         return Response(mypage_products_data, status=status.HTTP_200_OK)
 
 # url : /consumer/product/subscriber   - body : {product_id : 2}
