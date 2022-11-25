@@ -39,7 +39,7 @@ class ProductListPaginationViewSet(viewsets.ModelViewSet):
             mini_q.add(Q(product_name__icontains = search_text), condition.OR) # product_name - 대소문자 구분 X 검색
             mini_q.add(Q(product_group_name__icontains = search_text), condition.OR) # product_group_name - 대소문자 구분 X 검색
             condition.add(mini_q, condition.AND)
-        query_set = self.queryset.filter(condition)
+        query_set = self.queryset.filter(condition).select_related('payment_term')
         return query_set
 
 # url : /consumer/product/detail/{product_id}
@@ -71,7 +71,8 @@ class ProductDetailView(APIView):
         condition = Q()
         condition.add(Q(seller=detail_product.seller), condition.AND)
         condition.add(~Q(id=product_id), condition.AND)
-        other_prducts = list(Product.objects.filter(condition))
+        # other_prducts = list(Product.objects.filter(condition).prefetch_related('productimages_set'))
+        other_prducts = list(Product.objects.filter(condition).select_related('payment_term'))
         random.shuffle(other_prducts)
         other_prducts = other_prducts[:OTHER_PRODUCTS_NUM_IN_SELLER]
 
@@ -110,10 +111,8 @@ class HomeView(APIView):
             categor_cache_value = CategorySerializer_json_data
 
         # 2) 인기 상품 조회 && 3) 신규 상품 조회
-        popular_products = Product.objects.all().order_by('-num_of_subscribers')
-
-        # popular_products = Product.objects.all().select_related('payment_term').order_by('-num_of_subscribers')
-        new_products = Product.objects.all().order_by('-update_date')
+        new_products = Product.objects.all().select_related('payment_term').order_by('-update_date')
+        popular_products = Product.objects.all().select_related('payment_term').order_by('-num_of_subscribers')
         
         PRODUCT_NUM = min(Product.objects.count(), STANDARD_NUM_OF_PRODUCTS) # 현재 Product 갯수가 NUM_OF_PRODUCTS (10) 보다 적을 때
         popular_products = popular_products[:PRODUCT_NUM] # 내림차순 구독자 수
@@ -155,7 +154,7 @@ class MypageView(APIView):
 
         # Convert Json     
         product_id_json = json.loads(response.text)
-        mypage_products = Product.objects.filter(id__in = product_id_json).order_by('-update_date')
+        mypage_products = Product.objects.filter(id__in = product_id_json).select_related('payment_term').order_by('-update_date')
         mypage_products_data = ProductListSerializer(mypage_products, many=True).data
         return Response(mypage_products_data, status=status.HTTP_200_OK)
 
