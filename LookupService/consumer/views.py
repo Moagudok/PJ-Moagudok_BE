@@ -48,12 +48,13 @@ class ProductListPaginationViewSet(viewsets.ModelViewSet):
 # url : /consumer/product/cursor/list?category=1&search&cursor=cj0xJnA9Z2dn
 class ProductListCursorPaginationClass(CursorPagination): # 
     page_size = PER_PAGE_SIZE # settings.py의 Default 값 변경
+    ordering = 'update_date'
 
 # url : /consumer/product/cursor/list?category=1&search&cursor=cj0xJnA9Z2dn
 class ProductListCursorPaginationViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
     serializer_class = ProductListSerializer
     pagination_class = ProductListCursorPaginationClass
-    queryset = Product.objects.all()
     def get_queryset(self):
         condition = Q()
         category_id = self.request.query_params['category']
