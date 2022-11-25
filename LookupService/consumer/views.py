@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets, status
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import PageNumberPagination, CursorPagination
 from rest_framework.exceptions import ErrorDetail
 
 from django.db import transaction
@@ -20,6 +20,8 @@ import random
 import requests
 import json
 
+## PageNumberPagination
+# url : /consumer/product/list?category=1&search&page=1
 class ProductListPaginationClass(PageNumberPagination): # 
     page_size = PER_PAGE_SIZE # settings.py의 Default 값 변경
 
@@ -41,6 +43,31 @@ class ProductListPaginationViewSet(viewsets.ModelViewSet):
             condition.add(mini_q, condition.AND)
         query_set = self.queryset.filter(condition).select_related('payment_term')
         return query_set
+
+## CursorPagination
+# url : /consumer/product/cursor/list?category=1&search&cursor=cj0xJnA9Z2dn
+class ProductListCursorPaginationClass(CursorPagination): # 
+    page_size = PER_PAGE_SIZE # settings.py의 Default 값 변경
+
+# url : /consumer/product/cursor/list?category=1&search&cursor=cj0xJnA9Z2dn
+class ProductListCursorPaginationViewSet(viewsets.ModelViewSet):
+    serializer_class = ProductListSerializer
+    pagination_class = ProductListCursorPaginationClass
+    queryset = Product.objects.all()
+    def get_queryset(self):
+        condition = Q()
+        category_id = self.request.query_params['category']
+        search_text = self.request.query_params['search']
+        if category_id:
+            condition.add(Q(category_id = category_id), condition.AND)
+        if search_text:
+            mini_q = Q()
+            mini_q.add(Q(product_name__icontains = search_text), condition.OR) # product_name - 대소문자 구분 X 검색
+            mini_q.add(Q(product_group_name__icontains = search_text), condition.OR) # product_group_name - 대소문자 구분 X 검색
+            condition.add(mini_q, condition.AND)
+        query_set = self.queryset.filter(condition).select_related('payment_term')
+        return query_set
+
 
 # url : /consumer/product/detail/{product_id}
 class ProductDetailView(APIView):
