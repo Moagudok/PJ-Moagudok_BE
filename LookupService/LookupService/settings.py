@@ -53,6 +53,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Django DEBUG TOOLBAR
+if MODE == 'PRODUCTION':
+    pass
+else: # MODE = LOCAL or LOCAL_TEST
+    INSTALLED_APPS.append('debug_toolbar')
+    MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+    DEBUG_TOOLBAR_CONFIG = { "SHOW_TOOLBAR_CALLBACK": lambda request: True, }
+    INTERNAL_IPS = ['127.0.0.1',]
+    
 ROOT_URLCONF = 'LookupService.urls'
 
 TEMPLATES = [
