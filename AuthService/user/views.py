@@ -11,6 +11,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 import requests
 import json
 
+from cons import AWS_IP
+
 # user/login
 class LoginUserAPIView(APIView):
     
@@ -53,7 +55,7 @@ class UserAPIView(APIView):
     # 로그인 한 유저 정보 출력
     def get(self, request):
         user = UserModel.objects.get(id=request.user.id)
-        response = requests.get('http://52.79.143.145:8080/payment/consumer/mypage?consumerId='+str(request.user.id)+'&type=sub')
+        response = requests.get('http://'+AWS_IP+'/payment/consumer/mypage?consumerId='+str(request.user.id)+'&type=sub')
         product_list = json.loads(response.text)
         user_serializer = UserSerializer(user).data
         user_serializer['sub_product'] = list(product_list[0].keys());
