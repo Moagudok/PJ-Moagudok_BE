@@ -11,7 +11,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 import requests
 import json
 
-from constrants import AWS_URI
+from constrants import AWS_IP
 
 # user/login
 class LoginUserAPIView(APIView):
