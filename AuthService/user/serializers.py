@@ -4,8 +4,12 @@ from sharedb.models import User as UserModel
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
-        fields = "__all__"
-    
+        fields = ["email",
+                  "name",
+                  "address",
+                  "signup_method",
+                  "is_active",
+                  "is_seller"]    
     def create(self, *args, **kwargs):
         user = super().create(*args, **kwargs)
         password = user.password
