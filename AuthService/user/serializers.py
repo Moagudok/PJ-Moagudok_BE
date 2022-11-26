@@ -4,7 +4,8 @@ from sharedb.models import User as UserModel
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
-        fields = ["email",
+        fields = ["id",
+                  "email",
                   "name",
                   "address",
                   "signup_method",
