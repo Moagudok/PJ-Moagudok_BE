@@ -12,6 +12,7 @@ import requests
 import json
 
 from constrants import AWS_URI
+
 # user/login
 class LoginUserAPIView(APIView):
     
@@ -57,6 +58,6 @@ class UserAPIView(APIView):
         response = requests.get('http://'+AWS_URI+'/payment/consumer/mypage?consumerId='+str(request.user.id)+'&type=sub')
         product_list = json.loads(response.text)
         user_serializer = UserSerializer(user).data
-        user_serializer['sub_product'] = list(product_list[0].keys());
+        user_serializer['sub_product'] = list(map(int, product_list[0].keys()));
         return Response(user_serializer, status=status.HTTP_200_OK)
     
