@@ -9,7 +9,7 @@ from django.db.models import Q, F
 from django.core.cache import cache
 
 from sharedb.models import Category, Product
-from .serializers import CategoryListSerializer, ProductListSerializer, ProductDetailSerializer
+from .serializers import CategoryListSerializer, ProductListSerializer, ProductDetailSerializer, ProductListMypageSerializer
 from constants import COOKIE_KEY_NAME, EXPIRED_TIME, \
     STANDARD_NUM_OF_PRODUCTS, PER_PAGE_SIZE, \
     DEBUG_PRINT, OTHER_PRODUCTS_NUM_IN_SELLER, \
@@ -189,7 +189,7 @@ class MypageView(APIView):
             p_val_list.append(p_val)
 
         mypage_products = Product.objects.filter(id__in = p_key_list).select_related('payment_term').order_by('-update_date')
-        mypage_products_data = ProductListSerializer(mypage_products, many=True).data
+        mypage_products_data = ProductListMypageSerializer(mypage_products, many=True).data
         
         for p_orderdict, p_val in zip(mypage_products_data, p_val_list):
             p_orderdict.update({'period': p_val})
