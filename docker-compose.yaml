@@ -1,6 +1,18 @@
 version: "3.8"
 
 services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
+    expose:
+      - 5672
+      - 15672
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+
   redis:
     image: redis:5
     command: redis-server --port 6379
@@ -101,6 +113,9 @@ services:
       - 8004
     env_file:
       - ./MailService/.env
+    depends_on:
+      - rabbitmq
+      - celery_worker
 
   celery_sevice:
     build: ./MailService/
@@ -109,6 +124,8 @@ services:
     working_dir: /MailService/
     env_file:
       - ./MailService/.env
+    depends_on:
+      - rabbitmq
 
   # chatting_services:
   #   build: .
