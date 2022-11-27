@@ -27,10 +27,14 @@ class LoginUserAPIView(APIView):
 
         # Generate Token
         refresh = RefreshToken.for_user(user)
+        access = refresh.access_token
+
+        # add payload here!!
+        access['email'] = data['email']
 
         return Response(
             {
-                'access': str(refresh.access_token),
+                'access': str(access),
                 'refresh': str(refresh)
             }
             , status=status.HTTP_200_OK
