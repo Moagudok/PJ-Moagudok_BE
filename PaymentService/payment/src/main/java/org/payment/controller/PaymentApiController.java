@@ -5,7 +5,10 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.payment.entity.Payment;
 import org.payment.service.PaymentService;
@@ -27,7 +30,12 @@ public class PaymentApiController {
 
     // 결제 내역 생성
     @PostMapping
-    public ResponseEntity<?> save(@RequestBody Payment params, HttpServletRequest request) {
+    public ResponseEntity<?> save(@RequestBody Payment params, HttpServletRequest request) throws JsonProcessingException {
+        // 중복 결제 방지
+        List<Payment> checkDup = paymentService.checkDup(params.getConsumerId(), params.getProductId(), params.getSubscriptionDate());
+        if (!checkDup.isEmpty()){
+            return new ResponseEntity<>("중복된 결제입니다!",HttpStatus.CONFLICT);
+        }
         Payment payment = paymentService.save(params);
         // 구독자 수 증가 API 호출
         WebClient webClient = WebClient.create();
@@ -46,10 +54,25 @@ public class PaymentApiController {
         JSONObject jObject = new JSONObject(payload);
         String user_email = jObject.getString("email");
 
+        // product_id 를 이용해 product의 정보 조회
+        WebClient findProduct = WebClient.create();
+        String responseData = findProduct.get()
+                .uri("http://52.79.143.145:8001/consumer/product/detail/"+payment.getProductId())
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+        JSONObject product_details = new JSONObject(responseData);
+        JSONObject product_info = product_details.getJSONObject("detail_product_data");
+        String product_name = (String) product_info.get("product_name");
+        String subtitle = (String) product_info.get("subtitle");
+        String product_group_name = (String) product_info.get("product_group_name");
+
         // 메일발송 API 호출
         Map<String, Object> mailData = new HashMap<>();
         mailData.put("subject", "결제가 완료되었습니다. - 모아구독");
         mailData.put("message", "결제가 완료되었습니다! - 모아구독 \n" +
+                "상품 그룹 : " + product_group_name + "\n" +
+                "구독 상품 명 : " + product_name +" - " + subtitle + "\n" +
                 "결제 금액 : " + payment.getPrice() + "원 \n" +
                 "구독 날짜 : " + payment.getSubscriptionDate() + "\n" +
                 "만료 날짜 : " + payment.getExpirationDate() + "\n" +
@@ -64,7 +87,7 @@ public class PaymentApiController {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
-        return new ResponseEntity<>("결제 성공",HttpStatus.OK);
+        return new ResponseEntity<>("결제완료",HttpStatus.OK);
     }
     // 전체 결제 내역 조회
     @GetMapping
