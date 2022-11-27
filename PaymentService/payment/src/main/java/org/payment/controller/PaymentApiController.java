@@ -6,13 +6,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
 import org.payment.entity.Payment;
 import org.payment.service.PaymentService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping({"/payment"})
@@ -22,13 +27,40 @@ public class PaymentApiController {
 
     // 결제 내역 생성
     @PostMapping
-    public ResponseEntity<?> save(@RequestBody Payment params) {
+    public ResponseEntity<?> save(@RequestBody Payment params, HttpServletRequest request) {
         Payment payment = paymentService.save(params);
-        // webclient
+        // 구독자 수 증가 API 호출
         WebClient webClient = WebClient.create();
         webClient.put()
                 .uri("http://52.79.143.145:8001/consumer/product/subscriber")
                 .body(BodyInserters.fromFormData("product_id", payment.getProductId().toString()))
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        // JWT 토큰 Decode를 통한 접속한 유저의 email 값 가져오기
+        String authToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String[] chunks = authToken.split("\\.");
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+        String payload = new String(decoder.decode(chunks[1]));
+        JSONObject jObject = new JSONObject(payload);
+        String user_email = jObject.getString("email");
+
+        // 메일발송 API 호출
+        Map<String, Object> mailData = new HashMap<>();
+        mailData.put("subject", "결제가 완료되었습니다. - 모아구독");
+        mailData.put("message", "결제가 완료되었습니다! - 모아구독 \n" +
+                "결제 금액 : " + payment.getPrice() + "원 \n" +
+                "구독 날짜 : " + payment.getSubscriptionDate() + "\n" +
+                "만료 날짜 : " + payment.getExpirationDate() + "\n" +
+                "갱신 날짜 : " + payment.getPaymentDueDate() + "\n" +
+                "감사합니다.");
+        mailData.put("recipient", Arrays.asList(user_email));
+        WebClient mailReq = WebClient.create();
+        mailReq.post()
+                .uri("http://52.79.143.145:8002/mail/api")
+                .accept(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(mailData))
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();

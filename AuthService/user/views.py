@@ -11,6 +11,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 import requests
 import json
 
+import os
+import jwt
 from constrants import AWS_URI
 
 # user/login
@@ -27,10 +29,14 @@ class LoginUserAPIView(APIView):
 
         # Generate Token
         refresh = RefreshToken.for_user(user)
+        access = refresh.access_token
+
+        # add payload here!!
+        access['email'] = data['email']
 
         return Response(
             {
-                'access': str(refresh.access_token),
+                'access': str(access),
                 'refresh': str(refresh)
             }
             , status=status.HTTP_200_OK
