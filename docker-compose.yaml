@@ -38,7 +38,7 @@ services:
       - payment_service
       - search_service
       - mail_service
-      - celery_sevice
+      - celery_worker
 
   auth_service:
     build: ./AuthService/
