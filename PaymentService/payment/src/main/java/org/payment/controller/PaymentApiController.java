@@ -6,12 +6,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.payment.entity.Payment;
 import org.payment.service.PaymentService;
+import org.payment.uitl.Constants;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,7 +30,7 @@ public class PaymentApiController {
     // 결제 내역 생성
     @PostMapping
     public ResponseEntity<?> save(@RequestBody Payment params, HttpServletRequest request) throws JsonProcessingException {
-        // header 에 받아온 JWT 토큰 Decode를 통한 접속한 유저의 email 값 가져오기
+        // header 에 받아온 JWT 토큰 Decode를 통한 접속한 유저의 email, user_id 값 가져오기
         String authToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         String[] chunks = authToken.split("\\.");
         Base64.Decoder decoder = Base64.getUrlDecoder();
@@ -46,11 +45,13 @@ public class PaymentApiController {
         if (!checkDup.isEmpty()){
             return new ResponseEntity<>("중복된 결제입니다!",HttpStatus.CONFLICT);
         }
+        // payment 등록
         Payment payment = paymentService.save(params);
+
         // 구독자 수 증가 API 호출
         WebClient webClient = WebClient.create();
         webClient.put()
-                .uri("http://52.79.143.145:8001/consumer/product/subscriber")
+                .uri("http://"+ Constants.AWS_IP+Constants.PORT_LOOKUP+"/consumer/product/subscriber")
                 .body(BodyInserters.fromFormData("product_id", payment.getProductId().toString()))
                 .retrieve()
                 .bodyToMono(String.class)
@@ -59,7 +60,7 @@ public class PaymentApiController {
         // product_id 를 이용해 product의 정보 조회
         WebClient findProduct = WebClient.create();
         String responseData = findProduct.get()
-                .uri("http://52.79.143.145:8001/consumer/product/detail/"+payment.getProductId())
+                .uri("http://"+ Constants.AWS_IP+Constants.PORT_LOOKUP+"/consumer/product/detail/"+payment.getProductId())
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
@@ -83,7 +84,7 @@ public class PaymentApiController {
         mailData.put("recipient", Arrays.asList(user_email));
         WebClient mailReq = WebClient.create();
         mailReq.post()
-                .uri("http://52.79.143.145:8002/mail/api")
+                .uri("http://"+ Constants.AWS_IP+Constants.PORT_MAIL+"/mail/api")
                 .accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(mailData))
                 .retrieve()
