@@ -31,6 +31,16 @@ public class PaymentApiController {
     // 결제 내역 생성
     @PostMapping
     public ResponseEntity<?> save(@RequestBody Payment params, HttpServletRequest request) throws JsonProcessingException {
+        // header 에 받아온 JWT 토큰 Decode를 통한 접속한 유저의 email 값 가져오기
+        String authToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String[] chunks = authToken.split("\\.");
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+        String payload = new String(decoder.decode(chunks[1]));
+        JSONObject jObject = new JSONObject(payload);
+        String user_email = jObject.getString("email");
+        Long user_id = jObject.getLong("user_id");
+        params.setConsumerId(user_id);
+
         // 중복 결제 방지
         List<Payment> checkDup = paymentService.checkDup(params.getConsumerId(), params.getProductId(), params.getSubscriptionDate());
         if (!checkDup.isEmpty()){
@@ -45,14 +55,6 @@ public class PaymentApiController {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
-
-        // JWT 토큰 Decode를 통한 접속한 유저의 email 값 가져오기
-        String authToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String[] chunks = authToken.split("\\.");
-        Base64.Decoder decoder = Base64.getUrlDecoder();
-        String payload = new String(decoder.decode(chunks[1]));
-        JSONObject jObject = new JSONObject(payload);
-        String user_email = jObject.getString("email");
 
         // product_id 를 이용해 product의 정보 조회
         WebClient findProduct = WebClient.create();
