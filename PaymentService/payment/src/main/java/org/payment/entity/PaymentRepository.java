@@ -17,6 +17,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     List<Payment> findBySellerId(Long sellerId);
 
+    List<Payment> findByConsumerIdAndProductIdAndSubscriptionDate(Long consumerId, Long productId, LocalDate subscriptionDate);
+
     List<Payment> findByConsumerIdAndExpirationDateGreaterThanEqual(Long consumerId, LocalDate localDate);
 
     List<Payment> findByConsumerIdAndExpirationDateIs(Long consumerId, LocalDate localDate);

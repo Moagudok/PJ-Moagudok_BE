@@ -23,6 +23,11 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
     @Transactional
+    public List<Payment> checkDup(Long consumerId, Long productId, LocalDate subscriptionDate){
+        return paymentRepository.findByConsumerIdAndProductIdAndSubscriptionDate(consumerId, productId, subscriptionDate);
+    }
+
+    @Transactional
     public List<Payment> findAll() {
         return paymentRepository.findAll();
     }
