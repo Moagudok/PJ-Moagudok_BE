@@ -11,19 +11,22 @@ services:
     build: ./_nginx
     ports:
       - 80:80
-      - 10000:10000
-      - 10001:10001
-      - 10002:10002
-      - 10003:10003
-      - 10004:10004
-      - 10005:10005
-      
+      - 10000:10000 # auth_service
+      - 10001:10001 # lookup_service
+      - 10002:10002 # seller_service
+      - 10003:10003 # search_service
+      - 10004:10004 # payment_service
+      - 10005:10005 # chatting_service
+      - 10006:10006 # mail_service
+
     depends_on:
       - auth_service
       - lookup_service
       - seller_service
       - payment_service
       - search_service
+      - mail_service
+      - celery_sevice
 
   auth_service:
     build: ./AuthService/
@@ -87,6 +90,25 @@ services:
       - SPRING.JPA.DATABASE-PLATFORM=org.hibernate.dialect.PostgreSQLDialect
       - SPRING.JPA.GENERATE-DDL=true
       - SPRING.JPA.HIBERNATE.DDL-AUTO=validate    
+
+  mail_service:
+    build: ./MailService/
+    command: gunicorn -k uvicorn.workers.UvicornWorker app:app --bind 0.0.0.0:8004
+    ports:
+      - 8004:8004
+    working_dir: /MailService/
+    expose:
+      - 8004
+    env_file:
+      - ./MailService/.env
+
+  celery_sevice:
+    build: ./MailService/
+    command: celery -A celery_app worker -l info
+    # command: gunicorn SearchService.wsgi:application --bind 0.0.0.0:8003
+    working_dir: /MailService/
+    env_file:
+      - ./MailService/.env
 
   # chatting_services:
   #   build: .
