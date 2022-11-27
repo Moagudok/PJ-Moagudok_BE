@@ -31,6 +31,7 @@ class LoginUserAPIView(APIView):
 
         # add payload here!!
         access['email'] = data['email']
+        refresh['email'] = data['email']
 
         return Response(
             {
