@@ -51,7 +51,7 @@ public class PaymentApiController {
         // 구독자 수 증가 API 호출
         WebClient webClient = WebClient.create();
         webClient.put()
-                .uri("http://"+ Constants.AWS_IP+":8001/consumer/product/subscriber")
+                .uri("http://"+ Constants.AWS_IP+Constants.PORT_LOOKUP+"/consumer/product/subscriber")
                 .body(BodyInserters.fromFormData("product_id", payment.getProductId().toString()))
                 .retrieve()
                 .bodyToMono(String.class)
@@ -60,7 +60,7 @@ public class PaymentApiController {
         // product_id 를 이용해 product의 정보 조회
         WebClient findProduct = WebClient.create();
         String responseData = findProduct.get()
-                .uri("http://"+ Constants.AWS_IP+":8001/consumer/product/detail/"+payment.getProductId())
+                .uri("http://"+ Constants.AWS_IP+Constants.PORT_LOOKUP+"/consumer/product/detail/"+payment.getProductId())
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
@@ -84,7 +84,7 @@ public class PaymentApiController {
         mailData.put("recipient", Arrays.asList(user_email));
         WebClient mailReq = WebClient.create();
         mailReq.post()
-                .uri("http://"+ Constants.AWS_IP+":8002/mail/api")
+                .uri("http://"+ Constants.AWS_IP+Constants.PORT_MAIL+"/mail/api")
                 .accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(mailData))
                 .retrieve()
