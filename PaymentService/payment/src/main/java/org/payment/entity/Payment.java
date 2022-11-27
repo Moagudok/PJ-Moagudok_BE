@@ -3,6 +3,7 @@ package org.payment.entity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor
+@Setter
 @Table(schema = "public", name = "payment")
 public class Payment {
     @Id
