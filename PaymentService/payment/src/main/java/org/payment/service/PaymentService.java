@@ -63,34 +63,7 @@ public class PaymentService {
     public List<Payment> exp7ago(Long consumerId, LocalDate now, LocalDate ago){
         return paymentRepository.findByConsumerIdAndExpirationDateBetween(consumerId, now, ago);
     }
-    // 가상 정기 결제
-    // 실결제는 X , 일정 시간 paymentDueDate 조회하여
-    // 날짜 한달 뒤인 새로운 payment 자동 생성
-    @Scheduled(cron = "0 10 19 * * *") // 매일 오전 11시 마다
-    public void scheduleRun(){
-        List<Payment> paymentList = paymentRepository.findByPaymentDueDate(LocalDate.now());
-        for(Payment data : paymentList){
-            Payment entity = Payment.builder()
-                    .price(data.getPrice())
-                    .productId(data.getProductId())
-                    .consumerId(data.getConsumerId())
-                    .sellerId(data.getSellerId())
-                    .subscriptionDate(LocalDate.now())
-                    .expirationDate(LocalDate.now().plusMonths(1))
-                    .paymentDueDate(LocalDate.now().plusMonths(1))
-                    .build();
-            Payment newPayment = paymentRepository.save(entity);
-            // 해당 consumer의 이메일 주소 획득
-            WebClient webClient = WebClient.create();
-            String email = webClient.get()
-                        .uri("http://"+Constants.AWS_IP+Constants.PORT_AUTH+"/user/"+newPayment.getConsumerId())
-                        .retrieve()
-                        .bodyToMono(String.class)
-                        .block();
-            // 메일 발송
-            emailSend(email, newPayment);
-        }
-    }
+
     @Transactional
     public List<Payment> salesOfMonth(Long sellerId, LocalDate first, LocalDate last){
         return paymentRepository.findBySellerIdAndSubscriptionDateBetween(sellerId,first,last);

@@ -51,12 +51,8 @@ public class PaymentApiController {
         paymentService.updateSubCount(payment);
         // 메일 발송
         paymentService.emailSend(user_email, payment);
-        return new ResponseEntity<>("결제완료",HttpStatus.OK);
+        return new ResponseEntity<>("결제완료!",HttpStatus.OK);
     }
-
-
-
-
     // 전체 결제 내역 조회
     @GetMapping
     public ResponseEntity<?> findAll() {
@@ -166,18 +162,37 @@ public class PaymentApiController {
     }
     // 이번달 신규 유저 출력
     @GetMapping("/dashboard/newbie")
-    public List<HashMap<String, String>> newbieOfMonth(){
-        LocalDate first = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
-        LocalDate last = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
-        LocalDate preMonthFirst = LocalDate.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
-        LocalDate preMonthLast = LocalDate.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
+    public List<Map<String, Long>> newbieOfMonth(){
+        LocalDate init = LocalDate.now().minusMonths(1);
+        LocalDate first = init.with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate last = init.with(TemporalAdjusters.lastDayOfMonth());
+        LocalDate preMonthFirst = init.minusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate preMonthLast = init.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
 
         List<Payment> subList = paymentService.subscriptionData(first, last);
         List<Payment> preSubList = paymentService.subscriptionData(preMonthFirst, preMonthLast);
-
-
-        List<HashMap<String, String>> resultList = new ArrayList<>();
-
+        Map<Long,Long> count = new HashMap<>();
+        for(Payment data : subList){
+            if (count.get(data.getProductId()) == null){
+                count.put(data.getProductId(), 1L);
+            } else {
+                count.put(data.getProductId(), count.get(data.getProductId()) + 1);
+            }
+        }
+        for(Payment data : preSubList){
+            if (count.get(data.getProductId()) == null){
+                count.put(data.getProductId(), -1L);
+            } else {
+                count.put(data.getProductId(), count.get(data.getProductId()) - 1);
+            }
+        }
+        List<Map<String, Long>> resultList = new ArrayList<>();
+        for (Map.Entry<Long, Long> entry : count.entrySet()){
+            Map<String, Long> map = new HashMap<>();
+            map.put("product_id", entry.getKey());
+            map.put("count", entry.getValue());
+            resultList.add(map);
+        }
         return resultList;
     }
 }
