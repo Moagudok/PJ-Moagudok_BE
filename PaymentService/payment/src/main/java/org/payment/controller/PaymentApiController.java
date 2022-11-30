@@ -47,51 +47,16 @@ public class PaymentApiController {
         }
         // payment 등록
         Payment payment = paymentService.save(params);
-
         // 구독자 수 증가 API 호출
-        WebClient webClient = WebClient.create();
-        webClient.put()
-                .uri("http://"+ Constants.AWS_IP+Constants.PORT_LOOKUP+"/consumer/product/subscriber")
-                .body(BodyInserters.fromFormData("product_id", payment.getProductId().toString()))
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-
-        // product_id 를 이용해 product의 정보 조회
-        WebClient findProduct = WebClient.create();
-        String responseData = findProduct.get()
-                .uri("http://"+ Constants.AWS_IP+Constants.PORT_LOOKUP+"/consumer/product/detail/"+payment.getProductId())
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-        JSONObject product_details = new JSONObject(responseData);
-        JSONObject product_info = product_details.getJSONObject("detail_product_data");
-        String product_name = (String) product_info.get("product_name");
-        String subtitle = (String) product_info.get("subtitle");
-        String product_group_name = (String) product_info.get("product_group_name");
-
-        // 메일발송 API 호출
-        Map<String, Object> mailData = new HashMap<>();
-        mailData.put("subject", "결제가 완료되었습니다. - 모아구독");
-        mailData.put("message", "결제가 완료되었습니다! - 모아구독 \n" +
-                "상품 그룹 : " + product_group_name + "\n" +
-                "구독 상품 명 : " + product_name +" - " + subtitle + "\n" +
-                "결제 금액 : " + payment.getPrice() + "원 \n" +
-                "구독 날짜 : " + payment.getSubscriptionDate() + "\n" +
-                "만료 날짜 : " + payment.getExpirationDate() + "\n" +
-                "갱신 날짜 : " + payment.getPaymentDueDate() + "\n" +
-                "감사합니다.");
-        mailData.put("recipient", Arrays.asList(user_email));
-        WebClient mailReq = WebClient.create();
-        mailReq.post()
-                .uri("http://"+ Constants.AWS_IP+Constants.PORT_MAIL+"/mail/api")
-                .accept(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(mailData))
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+        paymentService.updateSubCount(payment);
+        // 메일 발송
+        paymentService.emailSend(user_email, payment);
         return new ResponseEntity<>("결제완료",HttpStatus.OK);
     }
+
+
+
+
     // 전체 결제 내역 조회
     @GetMapping
     public ResponseEntity<?> findAll() {
@@ -113,7 +78,7 @@ public class PaymentApiController {
         switch (type) {
             // 소비자의 구독중인 상품
             default: {
-                List<Payment> resultList = paymentService.sub_product(consumerId, LocalDate.now());
+                List<Payment> resultList = paymentService.subProduct(consumerId, LocalDate.now());
                 List<HashMap<Long, List<String>>> productList = new ArrayList<>();
                 HashMap<Long, List<String>> maps = new HashMap<Long, List<String>>();
                 for (Payment payment : resultList) {
@@ -124,7 +89,7 @@ public class PaymentApiController {
             }
             // 소비자의 오늘 만료되는 구독상품
             case "now": {
-                List<Payment> resultList = paymentService.exp_today(consumerId, LocalDate.now());
+                List<Payment> resultList = paymentService.expToday(consumerId, LocalDate.now());
                 List<HashMap<Long, List<String>>> productList = new ArrayList<>();
                 HashMap<Long, List<String>> maps = new HashMap<Long, List<String>>();
                 for (Payment payment : resultList) {
@@ -135,7 +100,7 @@ public class PaymentApiController {
             }
             // 소비자의 만료된 구독상품들
             case "exp": {
-                List<Payment> expList = paymentService.exp_product(consumerId, LocalDate.now());
+                List<Payment> expList = paymentService.expProduct(consumerId, LocalDate.now());
                 List<HashMap<Long, List<String>>> productList = new ArrayList<>();
                 HashMap<Long, List<String>> maps = new HashMap<Long, List<String>>();
                 for (Payment payment : expList) {
@@ -145,7 +110,7 @@ public class PaymentApiController {
                 productList.add(maps);
                 // 증복제거
                 // 현재 구독중인 상품 리스트 제거
-                List<Payment> subList = paymentService.sub_product(consumerId, LocalDate.now());
+                List<Payment> subList = paymentService.subProduct(consumerId, LocalDate.now());
                 for (Payment payment : subList){
                     for(HashMap<Long, List<String>> map : productList){
                         map.remove(payment.getProductId());
@@ -155,7 +120,7 @@ public class PaymentApiController {
             }
             // 소비자의 상품중 만료가 7일 전인 상품들
             case "7ago": {
-                List<Payment> resultList = paymentService.exp_7ago(consumerId, LocalDate.now(), LocalDate.now().plusWeeks(1));
+                List<Payment> resultList = paymentService.exp7ago(consumerId, LocalDate.now(), LocalDate.now().plusWeeks(1));
                 List<HashMap<Long, List<String>>> productList = new ArrayList<>();
                 HashMap<Long, List<String>> maps = new HashMap<Long, List<String>>();
                 for (Payment payment : resultList) {
@@ -197,6 +162,22 @@ public class PaymentApiController {
             maps.put("total_count", total_count);
             resultList.add(maps);
         }
+        return resultList;
+    }
+    // 이번달 신규 유저 출력
+    @GetMapping("/dashboard/newbie")
+    public List<HashMap<String, String>> newbieOfMonth(){
+        LocalDate first = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate last = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
+        LocalDate preMonthFirst = LocalDate.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate preMonthLast = LocalDate.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
+
+        List<Payment> subList = paymentService.subscriptionData(first, last);
+        List<Payment> preSubList = paymentService.subscriptionData(preMonthFirst, preMonthLast);
+
+
+        List<HashMap<String, String>> resultList = new ArrayList<>();
+
         return resultList;
     }
 }
