@@ -66,7 +66,7 @@ public class PaymentService {
     // 가상 정기 결제
     // 실결제는 X , 일정 시간 paymentDueDate 조회하여
     // 날짜 한달 뒤인 새로운 payment 자동 생성
-    @Scheduled(cron = "0 10 19 * * *") // 매일 오전 11시 마다
+    @Scheduled(cron = "0 15 19 * * *") // 매일 오전 11시 마다
     public void scheduleRun(){
         List<Payment> paymentList = paymentRepository.findByPaymentDueDate(LocalDate.now());
         for(Payment data : paymentList){
