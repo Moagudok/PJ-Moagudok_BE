@@ -48,7 +48,7 @@
 <br>
 
 ## 💡 Service Diagram
-
+![image](https://user-images.githubusercontent.com/33525798/204677212-75a7b00e-1fea-4bd9-a020-033457afbb3c.png)
 
 
 <br>
@@ -90,7 +90,7 @@
 
 <br>
 
-## 👉 Structure
+## 👉 Code Structure
 ```
 Moagudok
 ├── _nginx            // reverse proxing
