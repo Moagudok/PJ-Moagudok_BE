@@ -51,12 +51,8 @@ public class PaymentApiController {
         paymentService.updateSubCount(payment);
         // 메일 발송
         paymentService.emailSend(user_email, payment);
-        return new ResponseEntity<>("결제완료",HttpStatus.OK);
+        return new ResponseEntity<>("결제완료!",HttpStatus.OK);
     }
-
-
-
-
     // 전체 결제 내역 조회
     @GetMapping
     public ResponseEntity<?> findAll() {
