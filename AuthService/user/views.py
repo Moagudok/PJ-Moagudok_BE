@@ -63,4 +63,10 @@ class UserAPIView(APIView):
         user_serializer = UserSerializer(user).data
         user_serializer['sub_product'] = list(map(int, product_list[0].keys()));
         return Response(user_serializer, status=status.HTTP_200_OK)
+
+class UserInfoAPIView(APIView):
+    def get(self, request, id):
+        user = UserModel.objects.get(id=id);
+        user_serializer = UserSerializer(user).data
+        return Response(user_serializer['email'], status=status.HTTP_200_OK)
     
