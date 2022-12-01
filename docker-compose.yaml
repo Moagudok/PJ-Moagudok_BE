@@ -131,6 +131,7 @@ services:
     build: ./ChattingService/
     volumes:
       - ./ChattingService:/ChattingService
+      - /ChattingService/node_modules
     working_dir: /ChattingService
     ports:
       - 8008:8008
