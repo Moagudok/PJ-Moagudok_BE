@@ -163,7 +163,7 @@ public class PaymentApiController {
     // 이번달 신규 유저 출력
     @GetMapping("/dashboard/newbie")
     public List<Map<String, Long>> newbieOfMonth(){
-        LocalDate init = LocalDate.now().minusMonths(1);
+        LocalDate init = LocalDate.now();
         LocalDate first = init.with(TemporalAdjusters.firstDayOfMonth());
         LocalDate last = init.with(TemporalAdjusters.lastDayOfMonth());
         LocalDate preMonthFirst = init.minusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
