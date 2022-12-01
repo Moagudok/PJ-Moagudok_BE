@@ -11,5 +11,4 @@ RUN npm install
 COPY . /ChattingService
 
 # Bundle app source
-RUN ls -al
 EXPOSE 8008
