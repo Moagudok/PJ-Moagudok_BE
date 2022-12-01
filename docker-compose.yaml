@@ -129,8 +129,6 @@ services:
 
   chatting_services:
     build: ./ChattingService/
-    volumes:
-      - ./ChattingService:/ChattingService
     working_dir: /ChattingService
     ports:
       - 8008:8008
