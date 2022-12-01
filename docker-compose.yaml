@@ -127,7 +127,7 @@ services:
     depends_on:
       - rabbitmq
 
-  chatting_services:
+  chatting_service:
     build: ./ChattingService/
     working_dir: /ChattingService
     ports:
