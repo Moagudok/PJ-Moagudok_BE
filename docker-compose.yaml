@@ -130,6 +130,9 @@ services:
   chatting_service:
     build: ./ChattingService/
     working_dir: /ChattingService
+    volumes:
+      - ./ChattingService:/ChattingService
+      - /ChattingService/node_modules
     ports:
       - 8008:8008
     command: node app.js

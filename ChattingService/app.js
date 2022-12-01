@@ -1,42 +1,49 @@
-const { Server } = require("socket.io");
-const { ObjectId } = require("mongodb");
-const { MongoClient, ServerApiVersion } = require("mongodb");
-const express = require("express");
-const http = require("http");
+import { chatSave, roomSave, Chat, Room, findRoom } from './serializer.js';
+import { Server } from 'socket.io';
+import express from 'express';
+import http from 'http';
 const app = express();
 const port = process.env.PORT || 8008;
 const server = http.createServer(app);
 const io = new Server(server);
-const bodyParser = require("body-parser").json();
 const users = [];
-const mongoDBuri = require("./secure.json");
-const uri = mongoDBuri['mongodbURI']
-const client = new MongoClient(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  serverApi: { version: ServerApiVersion.v1 },
-});
-client.connect((err) => {
-  const chatDB = client.db("moa_gudok").collection("chat");
+
+server.listen(port, () => {
+  console.log(`서버시작 포트는 ${port}`);
 });
 
-const chatDB = client.db("moa_gudok").collection("chat");
-
-const chatSave = async (data) => {
-  await chatDB.insertOne(data);
-}
-
-app.get("/", (req, res) => {
-  res.status(200).json({ msg: "Server Moa Gudok Chat Server" });
-});
-
-app.get("/chatList", (req, res) => {
-  const { room } = req.query;
-  chatDB.find({ room }).sort({ _id: -1 }).limit(20).toArray((err, result) => {
-    if (err) throw err;
-    result.reverse();
-    res.status(200).json(result);
+app.get("/", async (req, res) => {
+  chatSave({
+    user: "user",
+    room: "room1",
+    userName: "user1",
+    message: "hello world",
+    time: new Date(),
   });
+  res.status(200).json({ msg: hello() });
+});
+
+app.get("/roomsave", async (req, res) => {
+  const room = req.query.room;
+  findRoom(room);
+  res.status(200).json({ msg: hello() });
+});
+
+app.get("/roomlist", async (req, res) => {
+  const room = req.query.room;
+  const roomList = await Room.find({
+    room: room,
+  });
+  res.status(200).json({ msg: roomList });
+});
+
+app.get("/chatlist", (req, res) => {
+  const room = req.query.room;
+  Chat.find({ room: room }, (err, result) => {
+    if (err) throw err;
+    res.status(200).json(result);
+  }
+  );
 });
 
 const chat = io.of("/chat");
@@ -61,14 +68,22 @@ chat.on("connection", (socket) => {
     console.log(`User left ${room}`);
     console.log(users);
   });
-  socket.on("chat message", (room, user, userName, message) => {
+  socket.on("chat message", async (room, user, userName, message, seller) => {
     socket.in(room).emit("chat message", room, user, message, users);
-    console.log(message);
-    const chatDoc = { user, message, room, userName, time: new Date() };
+    const roomList = await findRoom(room);
+    if (roomList.length == 0) {
+      roomSave({
+        sellerId: seller,
+        room: room,
+      });
+    }
+    const chatDoc = {
+      user: user,
+      room: room,
+      userName: userName,
+      message: message,
+      time: new Date(),
+    };
     chatSave(chatDoc);
   });
-});
-
-server.listen(port, () => {
-  console.log(`서버시작 포트${port}`);
 });
