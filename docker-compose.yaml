@@ -135,4 +135,5 @@ services:
     ports:
       - 8008:8008
 #     command: node app.js
-#     restart: always
+    command: ehco "hello"
+    restart: always
