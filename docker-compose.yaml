@@ -135,5 +135,4 @@ services:
     ports:
       - 8008:8008
 #     command: node app.js
-    command: ls
     restart: always
