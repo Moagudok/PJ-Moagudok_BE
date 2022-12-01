@@ -9,9 +9,10 @@ class UserSerializer(serializers.ModelSerializer):
                   "name",
                   "password",
                   "address",
-                  "signup_method",
+                  "signup_method_id",
                   "is_active",
-                  "is_seller"]    
+                  "is_seller"]
+        
     def create(self, *args, **kwargs):
         user = super().create(*args, **kwargs)
         password = user.password
