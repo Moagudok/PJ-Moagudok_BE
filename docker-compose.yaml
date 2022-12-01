@@ -134,5 +134,6 @@ services:
     working_dir: /ChattingService
     ports:
       - 8008:8008
-    command: node app.js
+#     command: node app.js
+    command: ls
     restart: always
