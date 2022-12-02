@@ -134,7 +134,7 @@ public class PaymentApiController {
         LocalDate first = init.with(TemporalAdjusters.firstDayOfMonth());
         LocalDate last = init.with(TemporalAdjusters.lastDayOfMonth());
 
-        List<Payment> monthList = paymentService.salesOfMonth(sellerId, first, last);
+        List<Payment> monthList = paymentService.salesOfSub(sellerId, first, last);
         List<HashMap<String, Long>> resultList = new ArrayList<>();
 
         List<Long> productList = new ArrayList<>();
@@ -163,7 +163,7 @@ public class PaymentApiController {
     // 이번달 신규 유저 출력
     @GetMapping("/dashboard/newbie")
     public List<Map<String, Long>> newbieOfMonth(){
-        LocalDate init = LocalDate.now().minusMonths(1);
+        LocalDate init = LocalDate.now();
         LocalDate first = init.with(TemporalAdjusters.firstDayOfMonth());
         LocalDate last = init.with(TemporalAdjusters.lastDayOfMonth());
         LocalDate preMonthFirst = init.minusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
@@ -194,5 +194,39 @@ public class PaymentApiController {
             resultList.add(map);
         }
         return resultList;
+    }
+    // 연도 별 월 매출
+    @GetMapping("/dashboard/monthly")
+    public Map<Integer, Integer> monthlySalesByYear(@RequestParam Long sellerId, Integer year) {
+        Map<Integer, Integer> resultMap = new HashMap<>();
+        for (int month = 1; month <= 12; month++) {
+            LocalDate first = LocalDate.of(year, month, 1);
+            LocalDate last = first.with(TemporalAdjusters.lastDayOfMonth());
+            List<Payment> payments = paymentService.salesOfSub(sellerId, first, last);
+            int total_price = 0;
+            for (Payment data : payments) {
+                total_price += data.getPrice();
+            }
+            resultMap.put(month, total_price);
+        }
+        return resultMap;
+    }
+    // 월 별 일 매출
+    @GetMapping("/dashboard/daily")
+    public Map<Integer, Integer> dailySalesByMonth(@RequestParam Long sellerId, Integer year, Integer month){
+        Map<Integer, Integer> resultMap = new HashMap<>();
+        LocalDate first = LocalDate.of(year, month, 1);
+        LocalDate last = first.with(TemporalAdjusters.lastDayOfMonth());
+        int lastDay = last.getDayOfMonth();
+        for (int days = 1; days <= lastDay; days++){
+            LocalDate date = LocalDate.of(year,month,days);
+            List<Payment> payments = paymentService.dailySalesOfSub(sellerId,date);
+            int total_price = 0;
+            for(Payment data : payments){
+                total_price += data.getPrice();
+            }
+            resultMap.put(days, total_price);
+        }
+        return resultMap;
     }
 }
