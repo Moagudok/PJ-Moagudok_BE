@@ -65,8 +65,12 @@ public class PaymentService {
     }
 
     @Transactional
-    public List<Payment> salesOfMonth(Long sellerId, LocalDate first, LocalDate last){
+    public List<Payment> salesOfSub(Long sellerId, LocalDate first, LocalDate last){
         return paymentRepository.findBySellerIdAndSubscriptionDateBetween(sellerId,first,last);
+    }
+    @Transactional
+    public List<Payment> dailySalesOfSub(Long sellerId, LocalDate date){
+        return paymentRepository.findBySellerIdAndSubscriptionDate(sellerId,date);
     }
     @Transactional
     public List<Payment> salesOfProduct(Long sellerId, Long productId, LocalDate first, LocalDate last){
