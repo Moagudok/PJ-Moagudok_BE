@@ -9,3 +9,4 @@ django-dotenv
 pytest-django
 pytest
 requests
+django-cors-headers

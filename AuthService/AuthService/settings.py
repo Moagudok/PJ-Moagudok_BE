@@ -17,8 +17,6 @@ from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
-
 ## TEST MODE
 # LOCAL_TEST : TEST CODE 작성시
 # LOCAL : 로컬 서버 돌릴 때 
@@ -148,6 +146,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# CORS
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
