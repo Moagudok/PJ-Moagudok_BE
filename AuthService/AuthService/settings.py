@@ -17,6 +17,7 @@ from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
 
 ## TEST MODE
 # LOCAL_TEST : TEST CODE 작성시
