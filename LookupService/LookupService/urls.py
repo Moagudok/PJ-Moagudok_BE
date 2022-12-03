@@ -7,6 +7,7 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('consumer/', include('consumer.urls')),
+    path('seller/', include('seller.urls')),
 ]
 
 # Add Debug Toolbar
