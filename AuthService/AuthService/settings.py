@@ -17,12 +17,11 @@ from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 ## TEST MODE
 # LOCAL_TEST : TEST CODE 작성시
 # LOCAL : 로컬 서버 돌릴 때 
 # PRODUCTION : 배포용
-MODE = "LOCAL"
+MODE = "PRODUCTION"
 
 # SECURITY WARNING: keep the secret key used in production secret!
 if MODE=="LOCAL_TEST" or MODE=='LOCAL':
@@ -147,6 +146,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# CORS
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://moa-seller.vercel.app",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/

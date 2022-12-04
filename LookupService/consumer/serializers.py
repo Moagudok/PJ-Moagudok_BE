@@ -20,6 +20,19 @@ class ProductListSerializer(serializers.ModelSerializer):
             "product_name", "payment_term", "price", "image"
         ]
 
+class ProductListMypageSerializer(serializers.ModelSerializer):
+    payment_term = serializers.SerializerMethodField()
+
+    def get_payment_term(self, obj):
+        return obj.payment_term.unit
+
+    class Meta:
+        model = Product
+        fields = [
+            "id", "seller", "product_group_name", "subtitle",
+            "product_name", "payment_term", "price", "image"
+        ]
+
 # 구독 상품 상세 이미지 정보
 class ProductImagesSerializer(serializers.ModelSerializer):
     class Meta:

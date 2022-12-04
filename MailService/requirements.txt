@@ -1,0 +1,7 @@
+asgiref
+celery
+fastapi
+fastapi-mail
+python-dotenv
+uvicorn
+gunicorn

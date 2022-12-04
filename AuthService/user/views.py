@@ -8,7 +8,10 @@ from .serializers import UserSerializer, LoginUserSerializer
 
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+import requests
+import json
 
+from constrants import AWS_IP
 
 # user/login
 class LoginUserAPIView(APIView):
@@ -24,6 +27,9 @@ class LoginUserAPIView(APIView):
 
         # Generate Token
         refresh = RefreshToken.for_user(user)
+
+        # add payload here!!
+        refresh['email'] = data['email']
 
         return Response(
             {
@@ -51,6 +57,16 @@ class UserAPIView(APIView):
     
     # 로그인 한 유저 정보 출력
     def get(self, request):
-        user = UserModel.objects.get(id=request.user.id)        
-        return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+        user = UserModel.objects.get(id=request.user.id)
+        response = requests.get('http://'+AWS_IP+'/payment/consumer/mypage?consumerId='+str(request.user.id)+'&type=sub')
+        product_list = json.loads(response.text)
+        user_serializer = UserSerializer(user).data
+        user_serializer['sub_product'] = list(map(int, product_list[0].keys()));
+        return Response(user_serializer, status=status.HTTP_200_OK)
+
+class UserInfoAPIView(APIView):
+    def get(self, request, id):
+        user = UserModel.objects.get(id=id);
+        user_serializer = UserSerializer(user).data
+        return Response(user_serializer['email'], status=status.HTTP_200_OK)
     

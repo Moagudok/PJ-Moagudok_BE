@@ -17,7 +17,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # TEST MODE
-MODE = "LOCAL"
+MODE = "PRODUCTION"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -49,11 +49,13 @@ INSTALLED_APPS = [
     "sharedb",
     "seller",
     'mail',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -155,6 +157,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+# CORS
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://moa-seller.vercel.app",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
