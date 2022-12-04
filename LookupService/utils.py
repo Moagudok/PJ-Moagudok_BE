@@ -37,10 +37,9 @@ def get_monthly_payment_by_year(seller_id, year):
     mode = getattr(settings, 'MODE', 'PRODUCTION')  
     print('====mode:', mode)
     if mode == 'PRODUCTION':
-        url = 'http://' + AWS_PAYMENT_IP + '/payment/dashboard?sellerId=' + seller_id + '&year=' + year
+        url = 'http://' + str(AWS_PAYMENT_IP) + '/payment/dashboard/monthly?sellerId=' + str(seller_id) + '&year=' + str(year)
     else:
         url = 'http://127.0.0.1:8080/payment/dashboard/monthly?sellerId=' + seller_id + '&year=' + year
-    
     response = requests.get(url)
     
     return response
@@ -49,7 +48,7 @@ def get_daily_payment_by_month(seller_id, year, month):
     mode = getattr(settings, 'MODE', 'PRODUCTION')  
     print('====mode:', mode)
     if mode == 'PRODUCTION':
-        url = 'http://' + AWS_PAYMENT_IP + '/payment/dashboard?sellerId=' + str(seller_id) + '&year=' + str(year)
+        url = 'http://' + str(AWS_PAYMENT_IP) + '/payment/dashboard/daily?sellerId=' + str(seller_id) + '&year=' + str(year) + '&month=' + str(month)
     else:
         url = 'http://127.0.0.1:8080/payment/dashboard/daily?sellerId=' + str(seller_id) + '&year=' + str(year) + '&month=' + str(month)
     response = requests.get(url)
