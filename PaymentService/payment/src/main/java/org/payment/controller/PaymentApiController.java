@@ -162,15 +162,23 @@ public class PaymentApiController {
     }
     // 이번달 신규 유저 출력
     @GetMapping("/dashboard/newbie")
-    public List<Map<String, Long>> newbieOfMonth(){
+    public List<Map<String, Long>> newbieOfMonth(@RequestBody HttpServletRequest request){
+        // header 에 받아온 JWT 토큰 Decode를 통한 접속한 유저의 email, user_id 값 가져오기
+        String authToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String[] chunks = authToken.split("\\.");
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+        String payload = new String(decoder.decode(chunks[1]));
+                JSONObject jObject = new JSONObject(payload);
+        Long sellerId = jObject.getLong("user_id");
+
         LocalDate init = LocalDate.now();
         LocalDate first = init.with(TemporalAdjusters.firstDayOfMonth());
         LocalDate last = init.with(TemporalAdjusters.lastDayOfMonth());
         LocalDate preMonthFirst = init.minusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
         LocalDate preMonthLast = init.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
 
-        List<Payment> subList = paymentService.subscriptionData(first, last);
-        List<Payment> preSubList = paymentService.subscriptionData(preMonthFirst, preMonthLast);
+        List<Payment> subList = paymentService.subscriptionData(sellerId, first, last);
+        List<Payment> preSubList = paymentService.subscriptionData(sellerId, preMonthFirst, preMonthLast);
         Map<Long,Long> count = new HashMap<>();
         for(Payment data : subList){
             if (count.get(data.getProductId()) == null){

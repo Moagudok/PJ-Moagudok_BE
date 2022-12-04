@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # LOCAL_TEST : TEST CODE 작성시
 # LOCAL : 로컬 서버 돌릴 때 
 # PRODUCTION : 배포용
-MODE = "PRODUCTION" 
+MODE = "LOCAL" 
 
 # SECURITY WARNING: keep the secret key used in production secret!
 if MODE=="LOCAL_TEST" or MODE=='LOCAL':
@@ -100,12 +100,12 @@ DATABASES = {
 if MODE == 'LOCAL_TEST' or MODE == 'LOCAL':
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'moa_gudok', # Schema Name
-            'USER': 'postgres', 
-            'PASSWORD': 'rlatjsals1!', # PASSWORD
-            'HOST': '127.0.0.1', 
-            'PORT': '5432', 
+            'ENGINE': os.environ.get("DB_ENGINE"),
+            'NAME': os.environ.get("DB_NAME"), # Schema Name
+            'USER': os.environ.get("DB_USER"),
+            'PASSWORD': os.environ.get("DB_PASSWORD"), # PASSWORD NAME
+            'HOST':os.environ.get("DB_HOST"),
+            'PORT':os.environ.get("DB_PORT"),
         }
     }
 elif MODE == 'PRODUCTION':
@@ -119,19 +119,7 @@ elif MODE == 'PRODUCTION':
             'PORT':os.environ.get("PRODUCTION_PORT"),
         }
     }
-# NOT TESTING MODE
-else: # MODE=LOCAL
-    DATABASES = {
-        'default': {
-            'ENGINE': os.environ.get("DB_ENGINE"),
-            'NAME': os.environ.get("DB_NAME"), # Schema Name
-            'USER': os.environ.get("DB_USER"),
-            'PASSWORD': os.environ.get("DB_PASSWORD"), # PASSWORD NAME
-            'HOST':os.environ.get("DB_HOST"),
-            'PORT':os.environ.get("DB_PORT"),
-        }
-    }
-
+    
 CACHES = {
     'default':{
         'BACKEND': 'django_redis.cache.RedisCache',
