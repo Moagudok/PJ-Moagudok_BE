@@ -108,7 +108,7 @@ class ProductView(APIView):
             product_obj = Product.objects.get(id=data["product_id"])
             for index, before_detail_image in enumerate(data["before_detail_images"]):
                 image_id = ProductImages.objects.get(
-                    image=before_detail_image).id
+                    image=before_detail_image, product__id = data["product_id"]).id
                 update_detail_image_obj = get_detail_image_obj(
                     image_id, data["after_detail_images"][index], product_obj)
                 update_detail_image_list.append(update_detail_image_obj)
@@ -125,7 +125,7 @@ class ProductView(APIView):
         for data in request.data["delete_detail_image_list"]:
             product_obj = Product.objects.get(id=data["product_id"])
             for detail_image in data["detail_images"]:
-                image_id = ProductImages.objects.get(image=detail_image).id
+                image_id = ProductImages.objects.get(image=detail_image, product__id = data["product_id"]).id
                 delete_detail_image_obj = get_detail_image_obj(
                     image_id, detail_image, product_obj)
                 delete_detail_image_list.append(delete_detail_image_obj)
