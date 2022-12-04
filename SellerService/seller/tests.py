@@ -30,6 +30,7 @@ class TestProductView():
             "category": 1,
             "product_group_name": "돼지 좋아",
             "product_name": "삼목살",
+            "subtitle" : "삼목삼목삼목살입니당",
             "payment_term": 3,
             "price": 30000,
             "image": "https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Ff39e8755-f73b-4199-bbd7-a9301a0df299%2FUntitled.png?table=block&id=7c6c3e3b-90d1-429e-b7e9-ef3ece1bab41&spaceId=37dd6269-774e-4741-aba2-448c2fe9ab02&width=2000&userId=b6877bc7-a03e-4708-815c-2ace04f89c71&cache=v2",
@@ -42,6 +43,7 @@ class TestProductView():
             "category": 1,
             "product_group_name": "소 좋아",
             "product_name": "갈비",
+            "subtitle" : "갈비갈비갈비입니당",
             "payment_term": 3,
             "price": 90000,
             "image": "https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Ff39e8755-f73b-4199-bbd7-a9301a0df299%2FUntitled.png?table=block&id=7c6c3e3b-90d1-429e-b7e9-ef3ece1bab41&spaceId=37dd6269-774e-4741-aba2-448c2fe9ab02&width=2000&userId=b6877bc7-a03e-4708-815c-2ace04f89c71&cache=v2",
@@ -57,32 +59,6 @@ class TestProductView():
             request_data), content_type="application/json")
         assert resp.status_code == status.HTTP_201_CREATED
 
-    @pytest.mark.skip()
-    def test_Read_Product(self, CreateCategories,
-                          CreateSignupMethod, CreateUser, CreatePaymentTerm,
-                          CreateProductImages, CreateProducts, client):
-
-        url = "/seller/product/1?page=" + \
-            str(PAGE_NUM) + "&filter=" + "views" + "&group_name=" + "돼지좋아"
-
-        user1 = User.objects.get(id=1)
-        client.force_login(user1)
-        resp = client.get(url)
-
-        sellers_products = resp.data['sellers_products']
-        total_page = resp.data['total_page']
-        is_grouped = resp.data['is_grouped']
-
-        sellers_products_len = len(sellers_products)
-
-        all_product_count = Product.objects.filter(is_active=True).count()
-
-        assert sellers_products_len <= STANDARD_NUM_OF_PRODUCTS
-        assert total_page * STANDARD_NUM_OF_PRODUCTS >= all_product_count
-        assert sellers_products[0]['views'] >= sellers_products[-1]['views']
-        assert is_grouped == True
-        assert resp.status_code == 200
-
     def test_Update_Prodcut(self, CreateCategories,
                             CreateSignupMethod, CreateUser, CreatePaymentTerm,
                             CreateProductImages, CreateProducts, client):
@@ -94,7 +70,7 @@ class TestProductView():
 
         before_update_price = Product.objects.filter(
             seller=user1, product_group_name="업데이트 테스트")[0].price
-        before_update_detail_images = ProductImages.objects.filter(product=15)[
+        before_update_detail_images = ProductImages.objects.filter(product=11)[
             0].image
         before_total_product_count = Product.objects.count()
 
@@ -102,8 +78,9 @@ class TestProductView():
             "update_product_list": [{
                 "id": 15,
                 "category": 1,
-                # "product_group_name": "업데이트 테스트",
+                "product_group_name": "업데이트 테스트",
                 "product_name": "업데이트 테스트1",
+                "subtitle" : "업데이트 소제목1",
                 "payment_term": 3,
                 "price": 40000,
                 "image": "https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Ff39e8755-f73b-4199-bbd7-a9301a0df299%2FUntitled.png?table=block&id=7c6c3e3b-90d1-429e-b7e9-ef3ece1bab41&spaceId=37dd6269-774e-4741-aba2-448c2fe9ab02&width=2000&userId=b6877bc7-a03e-4708-815c-2ace04f89c71&cache=v2",
@@ -112,8 +89,9 @@ class TestProductView():
                 {
                 "id": 16,
                 "category": 1,
-                # "product_group_name": "업데이트 테스트",
+                "product_group_name": "업데이트 테스트",
                 "product_name": "업데이트 테스트2",
+                "subtitle" : "업데이트 소제목2",
                 "payment_term": 3,
                 "price": 100000,
                 "image": "https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Ff39e8755-f73b-4199-bbd7-a9301a0df299%2FUntitled.png?table=block&id=7c6c3e3b-90d1-429e-b7e9-ef3ece1bab41&spaceId=37dd6269-774e-4741-aba2-448c2fe9ab02&width=2000&userId=b6877bc7-a03e-4708-815c-2ace04f89c71&cache=v2",
@@ -121,8 +99,9 @@ class TestProductView():
             }],
             "create_product_list": [{
                 "category": 1,
-                # "product_group_name": "생성테스트",
+                "product_group_name": "생성테스트",
                 "product_name": "생성 테스트1",
+                "subtitle" : "생성 테스트1",
                 "payment_term": 3,
                 "price": 30000,
                 "image": "https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Ff39e8755-f73b-4199-bbd7-a9301a0df299%2FUntitled.png?table=block&id=7c6c3e3b-90d1-429e-b7e9-ef3ece1bab41&spaceId=37dd6269-774e-4741-aba2-448c2fe9ab02&width=2000&userId=b6877bc7-a03e-4708-815c-2ace04f89c71&cache=v2",
@@ -130,8 +109,9 @@ class TestProductView():
             },
                 {
                 "category": 1,
-                # "product_group_name": "생성테스트",
+                "product_group_name": "생성테스트",
                 "product_name": "생성 테스트2",
+                "subtitle" : "생성 테스트2",
                 "payment_term": 3,
                 "price": 90000,
                 "image": "https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Ff39e8755-f73b-4199-bbd7-a9301a0df299%2FUntitled.png?table=block&id=7c6c3e3b-90d1-429e-b7e9-ef3ece1bab41&spaceId=37dd6269-774e-4741-aba2-448c2fe9ab02&width=2000&userId=b6877bc7-a03e-4708-815c-2ace04f89c71&cache=v2",
@@ -216,3 +196,5 @@ class TestProductView():
         assert update_test_product_count == 2
         assert delete_test_product_count == 2
         assert resp.status_code == 200
+
+
