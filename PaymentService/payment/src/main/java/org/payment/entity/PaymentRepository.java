@@ -32,7 +32,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     List<Payment> findByPaymentDueDate(LocalDate localDate);
 
     List<Payment> findBySellerIdAndSubscriptionDate(Long sellerId, LocalDate date);
-    
+
     List<Payment> findBySellerIdAndSubscriptionDateBetween(Long sellerId, LocalDate first, LocalDate last);
 
     List<Payment> findBySellerIdAndProductIdAndSubscriptionDateBetween(Long sellerId, Long productId, LocalDate first, LocalDate last);
