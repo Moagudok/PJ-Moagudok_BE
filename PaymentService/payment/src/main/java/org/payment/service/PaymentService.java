@@ -77,8 +77,8 @@ public class PaymentService {
         return paymentRepository.findBySellerIdAndProductIdAndSubscriptionDateBetween(sellerId,productId,first,last);
     }
     @Transactional
-    public List<Payment> subscriptionData(LocalDate first, LocalDate last){
-        return paymentRepository.findBySubscriptionDateBetween(first, last);
+    public List<Payment> subscriptionData(Long sellerId, LocalDate first, LocalDate last){
+        return paymentRepository.findBySellerIdAndSubscriptionDateBetween(sellerId, first, last);
     }
 
     // 구독자 수 증가 API 호출
