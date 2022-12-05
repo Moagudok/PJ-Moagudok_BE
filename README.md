@@ -61,7 +61,7 @@
 - [검색 히스토리 서비스 구현하기 (NoSQL vs RDB, Singleton 적용기](https://yubi5050.tistory.com/225)
 - [동기 기반 메일 서비스 비동기로 구현하기(by. FastAPI, RabbitMQ, Celery](https://yubi5050.tistory.com/227)
 - [Spring cron을 이용한 가상 자동 결제 구현, WebClient를 이용한 외부 api 호출](https://psb6604.tistory.com/83)
-- [Django JWT 커스텀, spring 단에서의 JWT decode](https://psb6604.tistory.com/84)
+- [Django simpleJWT 커스텀, spring에서의 JWT decode](https://psb6604.tistory.com/84)
 
 
 <br>
