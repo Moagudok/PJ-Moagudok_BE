@@ -22,6 +22,8 @@ class SearchLatestTextListView(APIView):
         db_col = db_obj.collection
 
         user_id = get_userinfo(request)
+        if user_id == None:
+            return Response({'detail':'User not logged in'}, status=status.HTTP_200_OK)
         is_searched = db_col.find_one({'user_id':user_id, 'searchText':search_text})
         if is_searched == None:
             db_col.insert_one(
