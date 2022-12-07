@@ -7,4 +7,5 @@ django-dotenv
 pytest-django
 pytest
 django-cors-headers
+requests
 # psycopg2-binary : EC2-Linux
