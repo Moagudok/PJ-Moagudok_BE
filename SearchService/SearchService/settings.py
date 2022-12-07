@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # LOCAL_TEST : TEST CODE 작성시
 # LOCAL : 로컬 서버 돌릴 때 
 # PRODUCTION : 배포용
-MODE = "PRODUCTION" 
+MODE = "LOCAL_TEST" 
 
 # SECURITY WARNING: keep the secret key used in production secret!
 if MODE=="LOCAL_TEST" or MODE=='LOCAL':
