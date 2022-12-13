@@ -20,12 +20,12 @@ class ChatMessage {
   }
 }
 
-app.use(cors(
-  {
-    origin: security.corsOrigin.origin,
-    credentials: true,
-  }
-));
+// app.use(cors(
+//   {
+//     origin: security.corsOrigin.origin,
+//     credentials: true,
+//   }
+// ));
 
 server.listen(port, () => {
   console.log(`서버시작 포트는 ${port}`);
