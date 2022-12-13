@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { security } from "./secure.js";
-//secure.json File import
+
 mongoose.connect(security.mongodbURI, {
   // useNewUrlPaser: true,
   // useUnifiedTofology: true,
@@ -22,7 +22,7 @@ const chatMessage = new Schema({
   userName: String,
   message: String,
   time: Date,
-});
+})
 const roomList = new Schema({
   sellerId: Number,
   room: String,

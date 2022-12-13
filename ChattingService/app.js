@@ -1,12 +1,35 @@
 import { chatSave, roomSave, Chat, Room, findRoom } from './serializer.js';
+import { security } from './secure.js';
 import { Server } from 'socket.io';
+import cors from 'cors';
 import express from 'express';
 import http from 'http';
 const app = express();
 const port = process.env.PORT || 8008;
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server,
+  {
+    cors: security.corsOrigin,
+  }
+);
 const users = [];
+
+class ChatMessage {
+  constructor(user, room, userName, message, time) {
+    this.user = user;
+    this.room = room;
+    this.userName = userName;
+    this.message = message;
+    this.time = time;
+  }
+}
+
+app.use(cors(
+  {
+    origin: security.corsOrigin.origin,
+    credentials: true,
+  }
+));
 
 server.listen(port, () => {
   console.log(`서버시작 포트는 ${port}`);
@@ -30,16 +53,16 @@ app.get("/roomsave", async (req, res) => {
 });
 
 app.get("/roomlist", async (req, res) => {
-  const room = req.query.room;
+  const seller = req.query.seller;
   const roomList = await Room.find({
-    room: room,
+    sellerId: seller,
   });
-  res.status(200).json({ msg: roomList });
+  res.status(200).json({ roomList: roomList });
 });
 
 app.get("/chatlist", (req, res) => {
   const room = req.query.room;
-  Chat.find({ room: room }, (err, result) => {
+  Chat.find({ room: `room${room}` }, (err, result) => {
     if (err) throw err;
     res.status(200).json(result);
   }
@@ -49,10 +72,12 @@ app.get("/chatlist", (req, res) => {
 const chat = io.of("/chat");
 
 chat.on("connection", (socket) => {
+  console.log("User connected");
   socket.on("disconnect", () => {
     console.log("User disconnected");
   });
   socket.on("join", (room, user) => {
+    console.log(room,user)
     socket.join(room);
     users.push({
       room: room,
@@ -74,14 +99,14 @@ chat.on("connection", (socket) => {
     if (roomList.length == 0) {
       roomSave({
         sellerId: seller,
-        room: room,
+        room,
       });
     }
     const chatDoc = {
-      user: user,
-      room: room,
-      userName: userName,
-      message: message,
+      user,
+      room,
+      userName,
+      message,
       time: new Date(),
     };
     chatSave(chatDoc);
