@@ -7,11 +7,7 @@ import http from 'http';
 const app = express();
 const port = process.env.PORT || 8008;
 const server = http.createServer(app);
-const io = new Server(server,
-  {
-    cors: security.corsOrigin,
-  }
-);
+const io = new Server(server);
 const users = [];
 
 class ChatMessage {
