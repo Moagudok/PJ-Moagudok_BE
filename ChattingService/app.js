@@ -84,7 +84,7 @@ chat.on("connection", (socket) => {
       room: room,
       user: user,
     });
-    socket.broadcast.emit("join users", users);
+    // socket.broadcast.emit("join users", users);
     console.log(`${user} has joined the room`);
     console.log(users);
   });
@@ -95,7 +95,7 @@ chat.on("connection", (socket) => {
     console.log(users);
   });
   socket.on("chat message", async (room, user, userName, message, seller) => {
-    socket.in(room).emit("chat message", room, user, message, users);
+    socket.in(room).emit("chat message", room, user, userName, message);
     const roomList = await findRoom(room);
     if (roomList.length == 0) {
       roomSave({
